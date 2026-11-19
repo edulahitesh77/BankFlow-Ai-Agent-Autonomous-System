@@ -42,6 +42,10 @@ def test_rabbitmq_connection_health():
 
 def test_topology_declaration_and_queue_inspection():
     """Verify exchanges and queues are declared with active status."""
+    declare_exchanges()
+    assert MAIN_EXCHANGE == "bankflow.events"
+    assert DEAD_LETTER_EXCHANGE == "bankflow.dlx"
+
     declare_queues_and_bindings()
     queues = inspect_queues_status()
 
