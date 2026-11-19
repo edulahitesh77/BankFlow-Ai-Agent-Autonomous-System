@@ -50,7 +50,7 @@ import { ReviewActionModal } from './components/ReviewActionModal';
 import { CorrectionActionModal } from './components/CorrectionActionModal';
 
 export const BankDashboardPage = () => {
-  const { user, logout } = useAuth();
+  const { user, role, logout } = useAuth();
   const navigate = useNavigate();
 
   const [profile, setProfile] = useState(null);
@@ -65,6 +65,8 @@ export const BankDashboardPage = () => {
   const [inspectModalOpen, setInspectModalOpen] = useState(false);
   const [reviewModalRequest, setReviewModalRequest] = useState(null);
   const [correctionModalRequest, setCorrectionModalRequest] = useState(null);
+
+  const effectiveRole = role || user?.role || profile?.role;
 
   const loadInitialData = async () => {
     try {
@@ -157,7 +159,7 @@ export const BankDashboardPage = () => {
     { id: 'recovery', label: 'Recovery & Reliability', icon: ShieldAlert },
     { id: 'federation', label: 'Branch Federation', icon: Network },
     { id: 'audit', label: 'Audit Logs', icon: ShieldCheck },
-    ...(role === 'ADMINISTRATOR' ? [{ id: 'admin', label: 'Administration', icon: Lock }] : []),
+    ...(effectiveRole === 'ADMINISTRATOR' ? [{ id: 'admin', label: 'Administration', icon: Lock }] : []),
   ];
 
   if (loading) {

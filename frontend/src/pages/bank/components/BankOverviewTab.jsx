@@ -18,7 +18,11 @@ import {
 export const BankOverviewTab = ({ data, onSelectTab, onSelectRequest }) => {
   if (!data) return null;
 
-  const { summary, request_distribution, status_distribution, service_demand, recent_activity } = data;
+  const summary = data?.summary || {};
+  const request_distribution = data?.request_distribution || [];
+  const status_distribution = data?.status_distribution || [];
+  const service_demand = data?.service_demand || [];
+  const recent_activity = data?.recent_activity || [];
 
   const summaryCards = [
     {
