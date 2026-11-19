@@ -176,17 +176,19 @@ export const AgentCommunicationTab = ({ onSelectRequest }) => {
               <h2 className="text-lg font-bold text-white tracking-tight">Structured Agent Communication System</h2>
               <span
                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                  brokerStatus?.status === 'UP'
+                  (brokerStatus?.broker_status || brokerStatus?.status) === 'UP'
                     ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
                     : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
                 }`}
               >
                 <span
                   className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-                    brokerStatus?.status === 'UP' ? 'bg-emerald-400 animate-ping' : 'bg-rose-400'
+                    (brokerStatus?.broker_status || brokerStatus?.status) === 'UP'
+                      ? 'bg-emerald-400 animate-ping'
+                      : 'bg-rose-400'
                   }`}
                 />
-                Broker {brokerStatus?.status || 'UNKNOWN'}
+                Broker {brokerStatus?.broker_status || brokerStatus?.status || (brokerStatus?.connected ? 'UP' : 'UNKNOWN')}
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
