@@ -20,6 +20,7 @@ from app.routes import (
     admin_router,
     recovery_router,
     federation_router,
+    visualizer_router,
 )
 from app.messaging.connection import connection_manager
 from app.messaging.queues import declare_queues_and_bindings
@@ -115,6 +116,7 @@ def create_application() -> FastAPI:
     app.include_router(admin_router)
     app.include_router(recovery_router)
     app.include_router(federation_router)
+    app.include_router(visualizer_router)
 
     # Top-level WebSocket monitoring route
     from app.routes.agents import websocket_agent_monitoring

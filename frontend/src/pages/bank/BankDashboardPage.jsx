@@ -30,6 +30,7 @@ import {
   Radio,
   Lock,
   Network,
+  Workflow,
 } from 'lucide-react';
 
 import { BankOverviewTab } from './components/BankOverviewTab';
@@ -40,6 +41,7 @@ import { NeedsCorrectionTab } from './components/NeedsCorrectionTab';
 import { RejectedRequestsTab } from './components/RejectedRequestsTab';
 import { CustomerRecordsTab } from './components/CustomerRecordsTab';
 import { AgentMonitoringTab } from './components/AgentMonitoringTab';
+import { WorkflowVisualizerTab } from './components/visualizer/WorkflowVisualizerTab';
 import { AgentCommunicationTab } from './components/AgentCommunicationTab';
 import { AgentRecoveryTab } from './components/AgentRecoveryTab';
 import { BranchFederationTab } from './components/BranchFederationTab';
@@ -154,6 +156,7 @@ export const BankDashboardPage = () => {
     },
     { id: 'rejected', label: 'Rejected Requests', icon: XCircle },
     { id: 'customers', label: 'Customer Records', icon: Users, badge: dashboardData?.summary?.total_customers },
+    { id: 'visualizer', label: 'AI Workflow Visualizer', icon: Workflow },
     { id: 'agents', label: 'Agent Monitoring', icon: Cpu },
     { id: 'communication', label: 'Agent Communication', icon: Radio },
     { id: 'recovery', label: 'Recovery & Reliability', icon: ShieldAlert },
@@ -360,6 +363,8 @@ export const BankDashboardPage = () => {
             {activeTab === 'customers' && (
               <CustomerRecordsTab onSelectRequest={handleOpenDetailModal} />
             )}
+
+            {activeTab === 'visualizer' && <WorkflowVisualizerTab />}
 
             {activeTab === 'agents' && <AgentMonitoringTab />}
 

@@ -982,6 +982,70 @@ export const triggerCrossBranchExchange = async (payload) => {
   return resData;
 };
 
+// ============================================================================
+// AI WORKFLOW VISUALIZER ENDPOINTS
+// ============================================================================
+
+export const fetchVisualizerRecentRequests = async (limit = 50) => {
+  const response = await fetch(`${API_BASE}/bank/visualizer/recent-requests?limit=${limit}`, {
+    headers: getHeaders(true),
+  });
+  handleAuthResponse(response);
+  const resData = await response.json();
+  if (!response.ok) {
+    throw new Error(resData.detail || 'Failed to fetch recent requests for visualizer.');
+  }
+  return resData;
+};
+
+export const fetchVisualizerRequestJourney = async (requestId) => {
+  const response = await fetch(`${API_BASE}/bank/visualizer/request-journey/${encodeURIComponent(requestId)}`, {
+    headers: getHeaders(true),
+  });
+  handleAuthResponse(response);
+  const resData = await response.json();
+  if (!response.ok) {
+    throw new Error(resData.detail || `Failed to fetch journey for request ${requestId}.`);
+  }
+  return resData;
+};
+
+export const fetchVisualizerDecisions = async (limit = 50) => {
+  const response = await fetch(`${API_BASE}/bank/visualizer/decisions?limit=${limit}`, {
+    headers: getHeaders(true),
+  });
+  handleAuthResponse(response);
+  const resData = await response.json();
+  if (!response.ok) {
+    throw new Error(resData.detail || 'Failed to fetch decision audit records.');
+  }
+  return resData;
+};
+
+export const fetchVisualizerAnalytics = async () => {
+  const response = await fetch(`${API_BASE}/bank/visualizer/analytics`, {
+    headers: getHeaders(true),
+  });
+  handleAuthResponse(response);
+  const resData = await response.json();
+  if (!response.ok) {
+    throw new Error(resData.detail || 'Failed to fetch visualizer performance analytics.');
+  }
+  return resData;
+};
+
+export const fetchVisualizerReplayManifest = async (scenarioName = 'Default Production Scenario') => {
+  const response = await fetch(`${API_BASE}/bank/visualizer/replay-manifest?scenario_name=${encodeURIComponent(scenarioName)}`, {
+    headers: getHeaders(true),
+  });
+  handleAuthResponse(response);
+  const resData = await response.json();
+  if (!response.ok) {
+    throw new Error(resData.detail || 'Failed to fetch simulation replay manifest.');
+  }
+  return resData;
+};
+
 
 
 

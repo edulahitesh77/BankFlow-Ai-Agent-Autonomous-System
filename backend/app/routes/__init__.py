@@ -13,6 +13,7 @@ from app.routes.messaging import router as messaging_router
 from app.routes.admin import admin_router
 from app.routes.recovery import recovery_router
 from app.routes.federation import router as federation_router
+from app.routes.visualizer import router as visualizer_router
 
 __all__ = [
     "health_router",
@@ -25,4 +26,5 @@ __all__ = [
     "admin_router",
     "recovery_router",
     "federation_router",
+    "visualizer_router",
 ]

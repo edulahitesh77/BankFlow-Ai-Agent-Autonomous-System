@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
-  "simulation_id": "SIM-BENCHMARK-1795076606",
+  "simulation_id": "SIM-BENCHMARK-1795100327",
   "scenario_name": "Multi-Agent Banking Benchmark Scenario",
-  "exported_at": "2026-11-19T08:23:26.162021+00:00",
+  "exported_at": "2026-11-19T14:58:47.760269+00:00",
   "total_ticks": 15,
   "total_events": 48,
   "metrics": {
@@ -21,7 +21,7 @@
   "snapshots": [
     {
       "tick": 0,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "queue_counts": {
         "NEW": 12,
         "CLASSIFIED": 0,
@@ -352,7 +352,7 @@
     },
     {
       "tick": 1,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "queue_counts": {
         "NEW": 8,
         "CLASSIFIED": 4,
@@ -683,7 +683,7 @@
     },
     {
       "tick": 2,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "queue_counts": {
         "NEW": 8,
         "CLASSIFIED": 0,
@@ -1014,7 +1014,7 @@
     },
     {
       "tick": 3,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "queue_counts": {
         "NEW": 8,
         "CLASSIFIED": 0,
@@ -1345,7 +1345,7 @@
     },
     {
       "tick": 4,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "queue_counts": {
         "NEW": 4,
         "CLASSIFIED": 4,
@@ -1676,7 +1676,7 @@
     },
     {
       "tick": 5,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "queue_counts": {
         "NEW": 4,
         "CLASSIFIED": 0,
@@ -2007,7 +2007,7 @@
     },
     {
       "tick": 6,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "queue_counts": {
         "NEW": 4,
         "CLASSIFIED": 0,
@@ -2338,7 +2338,7 @@
     },
     {
       "tick": 7,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "queue_counts": {
         "NEW": 0,
         "CLASSIFIED": 4,
@@ -2669,7 +2669,7 @@
     },
     {
       "tick": 8,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "queue_counts": {
         "NEW": 0,
         "CLASSIFIED": 0,
@@ -3000,7 +3000,7 @@
     },
     {
       "tick": 9,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "queue_counts": {
         "NEW": 0,
         "CLASSIFIED": 0,
@@ -3331,7 +3331,7 @@
     },
     {
       "tick": 10,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "queue_counts": {
         "NEW": 0,
         "CLASSIFIED": 0,
@@ -3662,7 +3662,7 @@
     },
     {
       "tick": 11,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "queue_counts": {
         "NEW": 0,
         "CLASSIFIED": 0,
@@ -3993,7 +3993,7 @@
     },
     {
       "tick": 12,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "queue_counts": {
         "NEW": 0,
         "CLASSIFIED": 0,
@@ -4324,7 +4324,7 @@
     },
     {
       "tick": 13,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "queue_counts": {
         "NEW": 0,
         "CLASSIFIED": 0,
@@ -4655,7 +4655,7 @@
     },
     {
       "tick": 14,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "queue_counts": {
         "NEW": 0,
         "CLASSIFIED": 0,
@@ -4989,7 +4989,7 @@
     {
       "event_id": "EVT-T1-REQ-2026-SYN-0001-INTAKE",
       "tick": 1,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "REQUEST_CLASSIFIED",
       "request_id": "REQ-2026-SYN-0001",
       "sender_agent": "AGT-CUST-SIM-01",
@@ -5003,7 +5003,7 @@
     {
       "event_id": "EVT-T1-REQ-2026-SYN-0002-INTAKE",
       "tick": 1,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "REQUEST_CLASSIFIED",
       "request_id": "REQ-2026-SYN-0002",
       "sender_agent": "AGT-CUST-SIM-01",
@@ -5017,7 +5017,7 @@
     {
       "event_id": "EVT-T1-REQ-2026-SYN-0003-INTAKE",
       "tick": 1,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "REQUEST_CLASSIFIED",
       "request_id": "REQ-2026-SYN-0003",
       "sender_agent": "AGT-CUST-SIM-01",
@@ -5031,7 +5031,7 @@
     {
       "event_id": "EVT-T1-REQ-2026-SYN-0004-INTAKE",
       "tick": 1,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "REQUEST_CLASSIFIED",
       "request_id": "REQ-2026-SYN-0004",
       "sender_agent": "AGT-CUST-SIM-01",
@@ -5045,7 +5045,7 @@
     {
       "event_id": "EVT-T2-REQ-2026-SYN-0001-DISPATCH",
       "tick": 2,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "TASK_DISPATCHED",
       "request_id": "REQ-2026-SYN-0001",
       "sender_agent": "AGT-INTAKE-01",
@@ -5059,7 +5059,7 @@
     {
       "event_id": "EVT-T2-REQ-2026-SYN-0002-DISPATCH",
       "tick": 2,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "TASK_DISPATCHED",
       "request_id": "REQ-2026-SYN-0002",
       "sender_agent": "AGT-INTAKE-01",
@@ -5073,7 +5073,7 @@
     {
       "event_id": "EVT-T2-REQ-2026-SYN-0003-DISPATCH",
       "tick": 2,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "TASK_DISPATCHED",
       "request_id": "REQ-2026-SYN-0003",
       "sender_agent": "AGT-INTAKE-01",
@@ -5087,7 +5087,7 @@
     {
       "event_id": "EVT-T2-REQ-2026-SYN-0004-DISPATCH",
       "tick": 2,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "TASK_DISPATCHED",
       "request_id": "REQ-2026-SYN-0004",
       "sender_agent": "AGT-INTAKE-01",
@@ -5101,7 +5101,7 @@
     {
       "event_id": "EVT-T3-REQ-2026-SYN-0001-VERIF",
       "tick": 3,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "PREREQUISITES_VERIFIED",
       "request_id": "REQ-2026-SYN-0001",
       "sender_agent": "RequestAgent_1",
@@ -5115,7 +5115,7 @@
     {
       "event_id": "EVT-T3-REQ-2026-SYN-0002-VERIF",
       "tick": 3,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "PREREQUISITES_VERIFIED",
       "request_id": "REQ-2026-SYN-0002",
       "sender_agent": "RequestAgent_2",
@@ -5129,7 +5129,7 @@
     {
       "event_id": "EVT-T3-REQ-2026-SYN-0003-VERIF",
       "tick": 3,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "PREREQUISITES_VERIFIED",
       "request_id": "REQ-2026-SYN-0003",
       "sender_agent": "RequestAgent_3",
@@ -5143,7 +5143,7 @@
     {
       "event_id": "EVT-T3-REQ-2026-SYN-0004-VERIF",
       "tick": 3,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "PREREQUISITES_VERIFIED",
       "request_id": "REQ-2026-SYN-0004",
       "sender_agent": "RequestAgent_1",
@@ -5157,7 +5157,7 @@
     {
       "event_id": "EVT-T4-REQ-2026-SYN-0001-SERVICE",
       "tick": 4,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "SERVICE_PROCESSING_STARTED",
       "request_id": "REQ-2026-SYN-0001",
       "sender_agent": "RequestAgent_1",
@@ -5171,7 +5171,7 @@
     {
       "event_id": "EVT-T4-REQ-2026-SYN-0002-SERVICE",
       "tick": 4,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "SERVICE_PROCESSING_STARTED",
       "request_id": "REQ-2026-SYN-0002",
       "sender_agent": "RequestAgent_2",
@@ -5185,7 +5185,7 @@
     {
       "event_id": "EVT-T4-REQ-2026-SYN-0003-SERVICE",
       "tick": 4,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "SERVICE_PROCESSING_STARTED",
       "request_id": "REQ-2026-SYN-0003",
       "sender_agent": "RequestAgent_3",
@@ -5199,7 +5199,7 @@
     {
       "event_id": "EVT-T4-REQ-2026-SYN-0004-SERVICE",
       "tick": 4,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "SERVICE_PROCESSING_STARTED",
       "request_id": "REQ-2026-SYN-0004",
       "sender_agent": "RequestAgent_1",
@@ -5213,7 +5213,7 @@
     {
       "event_id": "EVT-T4-REQ-2026-SYN-0005-INTAKE",
       "tick": 4,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "REQUEST_CLASSIFIED",
       "request_id": "REQ-2026-SYN-0005",
       "sender_agent": "AGT-CUST-SIM-01",
@@ -5227,7 +5227,7 @@
     {
       "event_id": "EVT-T4-REQ-2026-SYN-0006-INTAKE",
       "tick": 4,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "REQUEST_CLASSIFIED",
       "request_id": "REQ-2026-SYN-0006",
       "sender_agent": "AGT-CUST-SIM-01",
@@ -5241,7 +5241,7 @@
     {
       "event_id": "EVT-T4-REQ-2026-SYN-0007-INTAKE",
       "tick": 4,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "REQUEST_CLASSIFIED",
       "request_id": "REQ-2026-SYN-0007",
       "sender_agent": "AGT-CUST-SIM-01",
@@ -5255,7 +5255,7 @@
     {
       "event_id": "EVT-T4-REQ-2026-SYN-0008-INTAKE",
       "tick": 4,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "REQUEST_CLASSIFIED",
       "request_id": "REQ-2026-SYN-0008",
       "sender_agent": "AGT-CUST-SIM-01",
@@ -5269,7 +5269,7 @@
     {
       "event_id": "EVT-T5-REQ-2026-SYN-0005-DISPATCH",
       "tick": 5,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "TASK_DISPATCHED",
       "request_id": "REQ-2026-SYN-0005",
       "sender_agent": "AGT-INTAKE-01",
@@ -5283,7 +5283,7 @@
     {
       "event_id": "EVT-T5-REQ-2026-SYN-0006-DISPATCH",
       "tick": 5,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "TASK_DISPATCHED",
       "request_id": "REQ-2026-SYN-0006",
       "sender_agent": "AGT-INTAKE-01",
@@ -5297,7 +5297,7 @@
     {
       "event_id": "EVT-T5-REQ-2026-SYN-0007-DISPATCH",
       "tick": 5,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "TASK_DISPATCHED",
       "request_id": "REQ-2026-SYN-0007",
       "sender_agent": "AGT-INTAKE-01",
@@ -5311,7 +5311,7 @@
     {
       "event_id": "EVT-T5-REQ-2026-SYN-0008-DISPATCH",
       "tick": 5,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "TASK_DISPATCHED",
       "request_id": "REQ-2026-SYN-0008",
       "sender_agent": "AGT-INTAKE-01",
@@ -5325,7 +5325,7 @@
     {
       "event_id": "EVT-T6-REQ-2026-SYN-0006-VERIF",
       "tick": 6,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "PREREQUISITES_VERIFIED",
       "request_id": "REQ-2026-SYN-0006",
       "sender_agent": "RequestAgent_3",
@@ -5339,7 +5339,7 @@
     {
       "event_id": "EVT-T6-REQ-2026-SYN-0007-VERIF",
       "tick": 6,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "PREREQUISITES_VERIFIED",
       "request_id": "REQ-2026-SYN-0007",
       "sender_agent": "RequestAgent_1",
@@ -5353,7 +5353,7 @@
     {
       "event_id": "EVT-T6-REQ-2026-SYN-0008-VERIF",
       "tick": 6,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "PREREQUISITES_VERIFIED",
       "request_id": "REQ-2026-SYN-0008",
       "sender_agent": "RequestAgent_2",
@@ -5367,7 +5367,7 @@
     {
       "event_id": "EVT-T7-TIMEOUT-DETECTED",
       "tick": 7,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "AGENT_TIMEOUT_DETECTED",
       "request_id": "REQ-2026-SYN-0005",
       "sender_agent": "AGT-SUPERVISOR-01",
@@ -5381,7 +5381,7 @@
     {
       "event_id": "EVT-T7-REQ-2026-SYN-0006-SERVICE",
       "tick": 7,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "SERVICE_PROCESSING_STARTED",
       "request_id": "REQ-2026-SYN-0006",
       "sender_agent": "RequestAgent_3",
@@ -5395,7 +5395,7 @@
     {
       "event_id": "EVT-T7-REQ-2026-SYN-0007-SERVICE",
       "tick": 7,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "SERVICE_PROCESSING_STARTED",
       "request_id": "REQ-2026-SYN-0007",
       "sender_agent": "RequestAgent_1",
@@ -5409,7 +5409,7 @@
     {
       "event_id": "EVT-T7-REQ-2026-SYN-0008-SERVICE",
       "tick": 7,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "SERVICE_PROCESSING_STARTED",
       "request_id": "REQ-2026-SYN-0008",
       "sender_agent": "RequestAgent_2",
@@ -5423,7 +5423,7 @@
     {
       "event_id": "EVT-T7-REQ-2026-SYN-0009-INTAKE",
       "tick": 7,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "REQUEST_CLASSIFIED",
       "request_id": "REQ-2026-SYN-0009",
       "sender_agent": "AGT-CUST-SIM-01",
@@ -5437,7 +5437,7 @@
     {
       "event_id": "EVT-T7-REQ-2026-SYN-0010-INTAKE",
       "tick": 7,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "REQUEST_CLASSIFIED",
       "request_id": "REQ-2026-SYN-0010",
       "sender_agent": "AGT-CUST-SIM-01",
@@ -5451,7 +5451,7 @@
     {
       "event_id": "EVT-T7-REQ-2026-SYN-0011-INTAKE",
       "tick": 7,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "REQUEST_CLASSIFIED",
       "request_id": "REQ-2026-SYN-0011",
       "sender_agent": "AGT-CUST-SIM-01",
@@ -5465,7 +5465,7 @@
     {
       "event_id": "EVT-T7-REQ-2026-SYN-0012-INTAKE",
       "tick": 7,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "REQUEST_CLASSIFIED",
       "request_id": "REQ-2026-SYN-0012",
       "sender_agent": "AGT-CUST-SIM-01",
@@ -5479,7 +5479,7 @@
     {
       "event_id": "EVT-T8-SUPERVISOR-REASSIGN",
       "tick": 8,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "TASK_REASSIGNED",
       "request_id": "REQ-2026-SYN-0005",
       "sender_agent": "AGT-SUPERVISOR-01",
@@ -5493,7 +5493,7 @@
     {
       "event_id": "EVT-T8-REQ-2026-SYN-0009-DISPATCH",
       "tick": 8,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "TASK_DISPATCHED",
       "request_id": "REQ-2026-SYN-0009",
       "sender_agent": "AGT-INTAKE-01",
@@ -5507,7 +5507,7 @@
     {
       "event_id": "EVT-T8-REQ-2026-SYN-0010-DISPATCH",
       "tick": 8,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "TASK_DISPATCHED",
       "request_id": "REQ-2026-SYN-0010",
       "sender_agent": "AGT-INTAKE-01",
@@ -5521,7 +5521,7 @@
     {
       "event_id": "EVT-T8-REQ-2026-SYN-0011-DISPATCH",
       "tick": 8,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "TASK_DISPATCHED",
       "request_id": "REQ-2026-SYN-0011",
       "sender_agent": "AGT-INTAKE-01",
@@ -5535,7 +5535,7 @@
     {
       "event_id": "EVT-T8-REQ-2026-SYN-0012-DISPATCH",
       "tick": 8,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "TASK_DISPATCHED",
       "request_id": "REQ-2026-SYN-0012",
       "sender_agent": "AGT-INTAKE-01",
@@ -5549,7 +5549,7 @@
     {
       "event_id": "EVT-T9-REQ-2026-SYN-0009-VERIF",
       "tick": 9,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "PREREQUISITES_VERIFIED",
       "request_id": "REQ-2026-SYN-0009",
       "sender_agent": "RequestAgent_3",
@@ -5563,7 +5563,7 @@
     {
       "event_id": "EVT-T9-REQ-2026-SYN-0010-VERIF",
       "tick": 9,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "PREREQUISITES_VERIFIED",
       "request_id": "REQ-2026-SYN-0010",
       "sender_agent": "RequestAgent_1",
@@ -5577,7 +5577,7 @@
     {
       "event_id": "EVT-T9-REQ-2026-SYN-0011-VERIF",
       "tick": 9,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "PREREQUISITES_VERIFIED",
       "request_id": "REQ-2026-SYN-0011",
       "sender_agent": "RequestAgent_2",
@@ -5591,7 +5591,7 @@
     {
       "event_id": "EVT-T9-REQ-2026-SYN-0012-VERIF",
       "tick": 9,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "PREREQUISITES_VERIFIED",
       "request_id": "REQ-2026-SYN-0012",
       "sender_agent": "RequestAgent_3",
@@ -5605,7 +5605,7 @@
     {
       "event_id": "EVT-T10-REQ-2026-SYN-0009-SERVICE",
       "tick": 10,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "SERVICE_PROCESSING_STARTED",
       "request_id": "REQ-2026-SYN-0009",
       "sender_agent": "RequestAgent_3",
@@ -5619,7 +5619,7 @@
     {
       "event_id": "EVT-T10-REQ-2026-SYN-0010-SERVICE",
       "tick": 10,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "SERVICE_PROCESSING_STARTED",
       "request_id": "REQ-2026-SYN-0010",
       "sender_agent": "RequestAgent_1",
@@ -5633,7 +5633,7 @@
     {
       "event_id": "EVT-T10-REQ-2026-SYN-0011-SERVICE",
       "tick": 10,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "SERVICE_PROCESSING_STARTED",
       "request_id": "REQ-2026-SYN-0011",
       "sender_agent": "RequestAgent_2",
@@ -5647,7 +5647,7 @@
     {
       "event_id": "EVT-T10-REQ-2026-SYN-0012-SERVICE",
       "tick": 10,
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "event_type": "SERVICE_PROCESSING_STARTED",
       "request_id": "REQ-2026-SYN-0012",
       "sender_agent": "RequestAgent_3",
@@ -5699,7 +5699,7 @@
       "authorization_result": "AUTHORIZED",
       "correlation_id": "corr-fed-001-che-status",
       "event_status": "SUCCESS",
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "error_message": null
     },
     {
@@ -5712,7 +5712,7 @@
       "authorization_result": "AUTHORIZED",
       "correlation_id": "corr-fed-002-hyd-kyc",
       "event_status": "SUCCESS",
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "error_message": null
     },
     {
@@ -5725,7 +5725,7 @@
       "authorization_result": "REJECTED_UNAUTHORIZED_SCOPE",
       "correlation_id": "corr-fed-003-probe-rejected",
       "event_status": "REJECTED",
-      "timestamp": "2026-11-19T08:23:26.162021+00:00",
+      "timestamp": "2026-11-19T14:58:47.760269+00:00",
       "error_message": "Access denied: Scope 'FULL_ACCOUNT_EXTRACT' is outside permitted cross-branch information exchange."
     }
   ]
