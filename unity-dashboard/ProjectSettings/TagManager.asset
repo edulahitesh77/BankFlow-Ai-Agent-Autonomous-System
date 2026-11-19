@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+    - RequestToken
+    - AgentActor
+    - WorkflowStage
+    - MessagePacket
+  layers:
+    - Default
+    - TransparentFX
+    - Ignore Raycast
+    - 
+    - Water
+    - UI
+    - Agents
+    - Requests
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+    - 
+  m_SortingLayers:
+    - name: Default
+      uniqueID: 0
+      locked: 0
+    - name: Background
+      uniqueID: 1001
+      locked: 0
+    - name: WorkflowStages
+      uniqueID: 1002
+      locked: 0
+    - name: ConnectionLines
+      uniqueID: 1003
+      locked: 0
+    - name: Agents
+      uniqueID: 1004
+      locked: 0
+    - name: Requests
+      uniqueID: 1005
+      locked: 0
+    - name: MessagePackets
+      uniqueID: 1006
+      locked: 0
+    - name: UI
+      uniqueID: 1007
+      locked: 0

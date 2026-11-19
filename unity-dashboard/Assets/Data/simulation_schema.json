@@ -1,0 +1,583 @@
+{
+  "$defs": {
+    "AgentExportItem": {
+      "description": "Visual agent actor state and health telemetry.",
+      "properties": {
+        "agent_code": {
+          "title": "Agent Code",
+          "type": "string"
+        },
+        "agent_type": {
+          "title": "Agent Type",
+          "type": "string"
+        },
+        "availability_status": {
+          "title": "Availability Status",
+          "type": "string"
+        },
+        "processing_status": {
+          "title": "Processing Status",
+          "type": "string"
+        },
+        "health_status": {
+          "title": "Health Status",
+          "type": "string"
+        },
+        "current_request_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Current Request Id"
+        },
+        "completed_count": {
+          "default": 0,
+          "title": "Completed Count",
+          "type": "integer"
+        },
+        "failed_count": {
+          "default": 0,
+          "title": "Failed Count",
+          "type": "integer"
+        },
+        "retry_count": {
+          "default": 0,
+          "title": "Retry Count",
+          "type": "integer"
+        },
+        "is_paused": {
+          "default": false,
+          "title": "Is Paused",
+          "type": "boolean"
+        },
+        "last_heartbeat_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Heartbeat At"
+        }
+      },
+      "required": [
+        "agent_code",
+        "agent_type",
+        "availability_status",
+        "processing_status",
+        "health_status"
+      ],
+      "title": "AgentExportItem",
+      "type": "object"
+    },
+    "BranchExportItem": {
+      "description": "Federated branch state metadata for Unity visualization (Phase 10).",
+      "properties": {
+        "branch_id": {
+          "title": "Branch Id",
+          "type": "string"
+        },
+        "branch_name": {
+          "title": "Branch Name",
+          "type": "string"
+        },
+        "location": {
+          "title": "Location",
+          "type": "string"
+        },
+        "status": {
+          "default": "ACTIVE",
+          "title": "Status",
+          "type": "string"
+        },
+        "active_agents": {
+          "default": 0,
+          "title": "Active Agents",
+          "type": "integer"
+        },
+        "pending_requests": {
+          "default": 0,
+          "title": "Pending Requests",
+          "type": "integer"
+        },
+        "completed_requests": {
+          "default": 0,
+          "title": "Completed Requests",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "branch_id",
+        "branch_name",
+        "location"
+      ],
+      "title": "BranchExportItem",
+      "type": "object"
+    },
+    "FederationEventExportItem": {
+      "description": "Cross-branch federation event for Unity inter-branch trajectory replay (Phase 10).",
+      "properties": {
+        "federation_event_id": {
+          "title": "Federation Event Id",
+          "type": "string"
+        },
+        "source_branch_id": {
+          "title": "Source Branch Id",
+          "type": "string"
+        },
+        "destination_branch_id": {
+          "title": "Destination Branch Id",
+          "type": "string"
+        },
+        "request_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Request Id"
+        },
+        "event_type": {
+          "title": "Event Type",
+          "type": "string"
+        },
+        "requested_scope": {
+          "title": "Requested Scope",
+          "type": "string"
+        },
+        "authorization_result": {
+          "title": "Authorization Result",
+          "type": "string"
+        },
+        "correlation_id": {
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "event_status": {
+          "title": "Event Status",
+          "type": "string"
+        },
+        "timestamp": {
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "error_message": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error Message"
+        }
+      },
+      "required": [
+        "federation_event_id",
+        "source_branch_id",
+        "destination_branch_id",
+        "event_type",
+        "requested_scope",
+        "authorization_result",
+        "correlation_id",
+        "event_status",
+        "timestamp"
+      ],
+      "title": "FederationEventExportItem",
+      "type": "object"
+    },
+    "RequestExportItem": {
+      "description": "Visual request token metadata.",
+      "properties": {
+        "request_id": {
+          "title": "Request Id",
+          "type": "string"
+        },
+        "service_type": {
+          "title": "Service Type",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "stage": {
+          "title": "Stage",
+          "type": "string"
+        },
+        "priority": {
+          "default": "MEDIUM",
+          "title": "Priority",
+          "type": "string"
+        },
+        "assigned_agent": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assigned Agent"
+        },
+        "assignment_version": {
+          "default": 0,
+          "title": "Assignment Version",
+          "type": "integer"
+        },
+        "retry_count": {
+          "default": 0,
+          "title": "Retry Count",
+          "type": "integer"
+        },
+        "customer_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Customer Id"
+        },
+        "account_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Account Id"
+        },
+        "created_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Created At"
+        },
+        "updated_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Updated At"
+        }
+      },
+      "required": [
+        "request_id",
+        "service_type",
+        "status",
+        "stage"
+      ],
+      "title": "RequestExportItem",
+      "type": "object"
+    },
+    "SimulationEventExportItem": {
+      "description": "Chronological event exchanged between agents or lifecycle transition.",
+      "properties": {
+        "event_id": {
+          "title": "Event Id",
+          "type": "string"
+        },
+        "tick": {
+          "default": 0,
+          "title": "Tick",
+          "type": "integer"
+        },
+        "timestamp": {
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "event_type": {
+          "title": "Event Type",
+          "type": "string"
+        },
+        "request_id": {
+          "title": "Request Id",
+          "type": "string"
+        },
+        "sender_agent": {
+          "title": "Sender Agent",
+          "type": "string"
+        },
+        "receiver_agent": {
+          "title": "Receiver Agent",
+          "type": "string"
+        },
+        "previous_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Previous State"
+        },
+        "new_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "New State"
+        },
+        "assignment_version": {
+          "default": 0,
+          "title": "Assignment Version",
+          "type": "integer"
+        },
+        "reason_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason Code"
+        },
+        "payload": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Payload"
+        }
+      },
+      "required": [
+        "event_id",
+        "timestamp",
+        "event_type",
+        "request_id",
+        "sender_agent",
+        "receiver_agent"
+      ],
+      "title": "SimulationEventExportItem",
+      "type": "object"
+    },
+    "SimulationMetricsExport": {
+      "description": "Authoritative benchmark performance metrics generated by Python/Mesa.",
+      "properties": {
+        "total_requests": {
+          "title": "Total Requests",
+          "type": "integer"
+        },
+        "completed_requests": {
+          "title": "Completed Requests",
+          "type": "integer"
+        },
+        "failed_requests": {
+          "title": "Failed Requests",
+          "type": "integer"
+        },
+        "pending_requests": {
+          "title": "Pending Requests",
+          "type": "integer"
+        },
+        "human_review_requests": {
+          "title": "Human Review Requests",
+          "type": "integer"
+        },
+        "recovered_requests": {
+          "title": "Recovered Requests",
+          "type": "integer"
+        },
+        "avg_waiting_time_ticks": {
+          "title": "Avg Waiting Time Ticks",
+          "type": "number"
+        },
+        "avg_completion_time_ticks": {
+          "title": "Avg Completion Time Ticks",
+          "type": "number"
+        },
+        "throughput_per_minute": {
+          "title": "Throughput Per Minute",
+          "type": "number"
+        },
+        "request_agent_utilization": {
+          "title": "Request Agent Utilization",
+          "type": "number"
+        },
+        "message_integrity_rate": {
+          "title": "Message Integrity Rate",
+          "type": "number"
+        }
+      },
+      "required": [
+        "total_requests",
+        "completed_requests",
+        "failed_requests",
+        "pending_requests",
+        "human_review_requests",
+        "recovered_requests",
+        "avg_waiting_time_ticks",
+        "avg_completion_time_ticks",
+        "throughput_per_minute",
+        "request_agent_utilization",
+        "message_integrity_rate"
+      ],
+      "title": "SimulationMetricsExport",
+      "type": "object"
+    },
+    "SimulationSnapshotExport": {
+      "description": "Complete system snapshot at an individual simulation tick.",
+      "properties": {
+        "tick": {
+          "title": "Tick",
+          "type": "integer"
+        },
+        "timestamp": {
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "queue_counts": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Queue Counts",
+          "type": "object"
+        },
+        "active_requests": {
+          "items": {
+            "$ref": "#/$defs/RequestExportItem"
+          },
+          "title": "Active Requests",
+          "type": "array"
+        },
+        "agents": {
+          "items": {
+            "$ref": "#/$defs/AgentExportItem"
+          },
+          "title": "Agents",
+          "type": "array"
+        }
+      },
+      "required": [
+        "tick",
+        "timestamp",
+        "queue_counts",
+        "active_requests",
+        "agents"
+      ],
+      "title": "SimulationSnapshotExport",
+      "type": "object"
+    }
+  },
+  "description": "Top-level simulation export manifest consumed by Unity 2D JSON Importer.",
+  "properties": {
+    "schema_version": {
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "simulation_id": {
+      "title": "Simulation Id",
+      "type": "string"
+    },
+    "scenario_name": {
+      "title": "Scenario Name",
+      "type": "string"
+    },
+    "exported_at": {
+      "title": "Exported At",
+      "type": "string"
+    },
+    "total_ticks": {
+      "title": "Total Ticks",
+      "type": "integer"
+    },
+    "total_events": {
+      "title": "Total Events",
+      "type": "integer"
+    },
+    "metrics": {
+      "$ref": "#/$defs/SimulationMetricsExport"
+    },
+    "snapshots": {
+      "items": {
+        "$ref": "#/$defs/SimulationSnapshotExport"
+      },
+      "title": "Snapshots",
+      "type": "array"
+    },
+    "events": {
+      "items": {
+        "$ref": "#/$defs/SimulationEventExportItem"
+      },
+      "title": "Events",
+      "type": "array"
+    },
+    "branches": {
+      "items": {
+        "$ref": "#/$defs/BranchExportItem"
+      },
+      "title": "Branches",
+      "type": "array"
+    },
+    "federation_events": {
+      "items": {
+        "$ref": "#/$defs/FederationEventExportItem"
+      },
+      "title": "Federation Events",
+      "type": "array"
+    }
+  },
+  "required": [
+    "simulation_id",
+    "scenario_name",
+    "exported_at",
+    "total_ticks",
+    "total_events",
+    "metrics",
+    "snapshots",
+    "events"
+  ],
+  "title": "SimulationManifestExport",
+  "type": "object"
+}
