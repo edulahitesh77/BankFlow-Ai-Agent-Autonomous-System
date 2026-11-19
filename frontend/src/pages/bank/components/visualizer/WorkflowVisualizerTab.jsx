@@ -956,6 +956,7 @@ export const WorkflowVisualizerTab = () => {
       />
 
       <RequestJourneyDrawer
+        isOpen={journeyDrawerOpen}
         initialRequestId={journeyRequestId}
         onClose={() => setJourneyDrawerOpen(false)}
         onSelectRequest={handleOpenJourney}

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   X,
+  Minus,
+  Maximize2,
   Workflow,
   Clock,
   ArrowRight,
@@ -19,32 +21,43 @@ import {
   fetchVisualizerRequestJourney,
 } from '../../../../api/auth';
 
-export const RequestJourneyDrawer = ({ initialRequestId, onClose, onSelectRequest }) => {
+export const RequestJourneyDrawer = ({ isOpen, initialRequestId, onClose, onSelectRequest }) => {
   const [recentRequests, setRecentRequests] = useState([]);
   const [selectedRequestId, setSelectedRequestId] = useState(initialRequestId || '');
   const [journeyData, setJourneyData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isMinimized, setIsMinimized] = useState(false);
 
-  // Load recent requests for the selector
+  // Sync initialRequestId when updated from outside (e.g. clicking an event or agent)
   useEffect(() => {
+    if (initialRequestId) {
+      setSelectedRequestId(initialRequestId);
+      setIsMinimized(false);
+    }
+  }, [initialRequestId]);
+
+  // Load concise list of recent requests (reduced to 6 top requests as requested)
+  useEffect(() => {
+    if (!isOpen) return;
     const loadRequests = async () => {
       try {
-        const list = await fetchVisualizerRecentRequests(40);
-        setRecentRequests(list);
-        if (!selectedRequestId && list.length > 0) {
-          setSelectedRequestId(list[0].request_id);
+        const list = await fetchVisualizerRecentRequests(6);
+        const conciseList = list.slice(0, 6);
+        setRecentRequests(conciseList);
+        if (!selectedRequestId && conciseList.length > 0) {
+          setSelectedRequestId(conciseList[0].request_id);
         }
       } catch (err) {
         console.error('Failed to load recent requests for journey inspector:', err);
       }
     };
     loadRequests();
-  }, []);
+  }, [isOpen]);
 
   // When selectedRequestId changes, fetch its journey
   useEffect(() => {
-    if (!selectedRequestId) return;
+    if (!isOpen || !selectedRequestId) return;
     const loadJourney = async () => {
       setLoading(true);
       setError(null);
@@ -58,11 +71,41 @@ export const RequestJourneyDrawer = ({ initialRequestId, onClose, onSelectReques
       }
     };
     loadJourney();
-  }, [selectedRequestId]);
+  }, [isOpen, selectedRequestId]);
+
+  if (!isOpen) return null;
+
+  // Minimized Floating Pill View (leaves canvas completely clear)
+  if (isMinimized) {
+    return (
+      <div className="fixed bottom-6 right-6 z-50 flex items-center space-x-2.5 p-2 px-3 rounded-2xl bg-[#091126]/95 border border-cyan-500/40 shadow-2xl backdrop-blur-md animate-fadeIn">
+        <div className="flex items-center space-x-2">
+          <Workflow className="w-4 h-4 text-cyan-400" />
+          <span className="text-xs font-mono font-bold text-white truncate max-w-[150px]">
+            {selectedRequestId || 'Request Journey'}
+          </span>
+        </div>
+        <button
+          onClick={() => setIsMinimized(false)}
+          className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 transition"
+          title="Expand Journey Inspector"
+        >
+          <Maximize2 className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={onClose}
+          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+          title="Close Inspector"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-[#091126]/98 backdrop-blur-xl border-l border-slate-800 shadow-2xl flex flex-col transform transition-transform duration-300">
-      {/* Header */}
+      {/* Header with Minimize and Close Buttons */}
       <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
@@ -74,32 +117,43 @@ export const RequestJourneyDrawer = ({ initialRequestId, onClose, onSelectReques
           </div>
         </div>
 
-        <button
-          onClick={onClose}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        <div className="flex items-center space-x-1.5">
+          <button
+            onClick={() => setIsMinimized(true)}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-300 hover:bg-slate-800 transition"
+            title="Minimize to Floating Pill"
+          >
+            <Minus className="w-4 h-4" />
+          </button>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            title="Close Drawer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
-      {/* Request Selector Toolbar */}
+      {/* Concise Request Selector (Limited to top 6 recent requests) */}
       <div className="p-4 border-b border-slate-800/80 bg-slate-900/40 space-y-2">
-        <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
-          Select or Search Banking Request
-        </label>
-        <div className="flex items-center space-x-2">
-          <select
-            value={selectedRequestId}
-            onChange={(e) => setSelectedRequestId(e.target.value)}
-            className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 font-mono"
-          >
-            {recentRequests.map((r) => (
-              <option key={r.request_id} value={r.request_id}>
-                {r.request_id} • {r.service_type} ({r.request_status})
-              </option>
-            ))}
-          </select>
+        <div className="flex items-center justify-between">
+          <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+            Select Banking Request ({recentRequests.length} Recent)
+          </label>
+          <span className="text-[10px] text-cyan-400 font-mono font-medium">Top Recent</span>
         </div>
+        <select
+          value={selectedRequestId}
+          onChange={(e) => setSelectedRequestId(e.target.value)}
+          className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 font-mono"
+        >
+          {recentRequests.map((r) => (
+            <option key={r.request_id} value={r.request_id}>
+              {r.request_id} • {r.service_type} ({r.request_status})
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Content Scroll */}
@@ -202,7 +256,7 @@ export const RequestJourneyDrawer = ({ initialRequestId, onClose, onSelectReques
                       <div className="p-2 rounded-lg bg-slate-950/60 border border-slate-850 flex items-center justify-between text-[11px]">
                         <div className="flex items-center space-x-1.5 text-slate-400">
                           <span className="text-[9px] uppercase font-semibold">Reason:</span>
-                          <span className="font-mono text-emerald-400">{st.reason_code}</span>
+                          <span className="font-mono text-emerald-400 truncate max-w-[200px]">{st.reason_code}</span>
                         </div>
                         {st.duration_seconds > 0 && (
                           <div className="flex items-center space-x-1 text-slate-400 font-mono text-[10px]">
@@ -220,8 +274,16 @@ export const RequestJourneyDrawer = ({ initialRequestId, onClose, onSelectReques
         ) : null}
       </div>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-slate-800 bg-slate-900/80 flex justify-end">
+      {/* Footer with Minimize and Close Options */}
+      <div className="p-4 border-t border-slate-800 bg-slate-900/80 flex items-center justify-between">
+        <button
+          onClick={() => setIsMinimized(true)}
+          className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-cyan-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition"
+        >
+          <Minus className="w-3.5 h-3.5" />
+          <span>Minimize Drawer</span>
+        </button>
+
         <button
           onClick={onClose}
           className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition"
