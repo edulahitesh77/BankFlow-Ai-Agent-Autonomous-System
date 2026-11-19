@@ -116,6 +116,10 @@ def create_application() -> FastAPI:
     app.include_router(recovery_router)
     app.include_router(federation_router)
 
+    # Top-level WebSocket monitoring route
+    from app.routes.agents import websocket_agent_monitoring
+    app.add_api_websocket_route("/ws/agents/monitoring", websocket_agent_monitoring)
+
     # Global Exception Handler
     @app.exception_handler(Exception)
     async def global_exception_handler(request: FastAPIRequest, exc: Exception):

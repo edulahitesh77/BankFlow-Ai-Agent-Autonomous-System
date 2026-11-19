@@ -481,6 +481,17 @@ export const fetchBankAuditLogs = async ({
   return resData;
 };
 
+export const fetchRealtimeAgentMonitoring = async () => {
+  const response = await fetch(`${API_BASE}/bank/agents/realtime-monitoring`, {
+    headers: getHeaders(true),
+  });
+  const resData = await response.json();
+  if (!response.ok) {
+    throw new Error(resData.detail || 'Failed to fetch realtime agent monitoring data.');
+  }
+  return resData;
+};
+
 export const fetchBankAgents = async () => {
   const response = await fetch(`${API_BASE}/bank/agents`, {
     headers: getHeaders(true),

@@ -86,3 +86,65 @@ class RunTestScenarioResponse(BaseModel):
     peak_concurrency: int
     status_breakdown: Dict[str, int]
     execution_logs: List[str]
+
+
+# ----------------------------------------------------------------------------
+# Real-Time Agent Monitoring Dashboard Schemas
+# ----------------------------------------------------------------------------
+
+class RealtimeAgentInfo(BaseModel):
+    """Live telemetry and status for an individual agent in the swarm."""
+    id: Optional[int] = None
+    agent_code: str
+    agent_name: str
+    agent_type: str
+    category: str  # CORE_PIPELINE, REQUEST_POOL, SERVICE_POOL, SUPERVISOR
+    availability_status: str  # AVAILABLE, BUSY, UNAVAILABLE
+    health_status: str  # HEALTHY, IDLE, BUSY, UNRESPONSIVE, FAILED, RECOVERING
+    status: str  # IDLE, BUSY, PROCESSING, FAILED, RECOVERING
+    current_request_id: Optional[str] = None
+    current_stage: str  # IDLE, NEW, CLASSIFIED, QUEUED, VERIFIED, IN_SERVICE, COMPLETED, etc.
+    completed_tasks: int = 0
+    failed_tasks: int = 0
+    last_heartbeat: Optional[str] = None
+    last_active_at: Optional[str] = None
+    supported_skills: List[str] = []
+
+
+class RealtimeEventLogItem(BaseModel):
+    """Immutable timestamped event in the live monitoring stream."""
+    event_id: str
+    timestamp: str
+    category: str  # COMMUNICATION, ASSIGNMENT, COMPLETION, FAILURE, RECOVERY
+    sender: str
+    receiver: Optional[str] = None
+    request_id: Optional[str] = None
+    message: str
+    severity: str  # info, success, warning, error
+    details: Optional[Dict[str, Any]] = None
+
+
+class RealtimeMonitoringMetrics(BaseModel):
+    """High-level request throughput and worker availability metrics."""
+    total_requests: int
+    processed_requests: int
+    failed_requests: int
+    pending_requests: int
+    human_review_requests: int
+    correction_requests: int
+    active_workers: int
+    total_agents: int
+    idle_agents: int
+
+
+class RealtimeMonitoringResponse(BaseModel):
+    """Complete real-time monitoring telemetry payload."""
+    is_running: bool
+    status_indicator: str  # "LIVE" or "SIMULATION STOPPED"
+    current_tick: int
+    scenario_name: str
+    timestamp: str
+    metrics: RealtimeMonitoringMetrics
+    agents: List[RealtimeAgentInfo]
+    events: List[RealtimeEventLogItem]
+
