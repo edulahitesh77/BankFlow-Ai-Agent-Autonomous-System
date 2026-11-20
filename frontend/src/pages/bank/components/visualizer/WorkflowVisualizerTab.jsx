@@ -23,6 +23,7 @@ import {
   Layers,
   Search,
   Maximize2,
+  Minimize2,
   Flame,
   Radio,
   Clock,
@@ -31,6 +32,15 @@ import {
   Network,
   Lock,
   ShieldAlert,
+  Eye,
+  ChevronDown,
+  ChevronUp,
+  X,
+  ExternalLink,
+  User,
+  Inbox,
+  Briefcase,
+  Grid,
 } from 'lucide-react';
 
 import { AgentNode } from './AgentNode';
@@ -46,6 +56,7 @@ import { LiveEventTimeline } from './LiveEventTimeline';
 import { FederationNetworkView } from './FederationNetworkView';
 import { SecurityOperationsView } from './SecurityOperationsView';
 import { FailureRecoveryView } from './FailureRecoveryView';
+import { AgentWorkDeck } from './AgentWorkDeck';
 
 import {
   getStoredToken,
@@ -69,6 +80,17 @@ const edgeTypes = {
 export const WorkflowVisualizerTab = () => {
   // Visualizer View Mode: 'agents' | 'federation' | 'security' | 'recovery'
   const [activeVisualizerView, setActiveVisualizerView] = useState('agents');
+
+  // Multi-Agent Swarm Sub-View: 'graph' (Canvas) | 'deck' (Neat Agent Work Deck Grid)
+  const [swarmSubView, setSwarmSubView] = useState('graph');
+
+  // Fullscreen Canvas / Visualizer Mode
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const visualizerContainerRef = useRef(null);
+
+  // Focused Agent Workstation state
+  const [focusedAgent, setFocusedAgent] = useState(null);
+  const [isWorkstationMinimized, setIsWorkstationMinimized] = useState(false);
 
   // Live Telemetry state
   const [monitoringData, setMonitoringData] = useState(null);
@@ -96,7 +118,6 @@ export const WorkflowVisualizerTab = () => {
 
   // Timeline pause state (pauses visual stream without pausing backend)
   const [isStreamPaused, setIsStreamPaused] = useState(false);
-  const frozenEventsRef = useRef([]);
 
   // React Flow Nodes & Edges State
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -111,9 +132,61 @@ export const WorkflowVisualizerTab = () => {
   const reactFlowInstanceRef = useRef(null);
 
   // ==========================================================================
+  // FULLSCREEN ENGINE & LISTENERS
+  // ==========================================================================
+  const toggleFullscreen = useCallback(() => {
+    if (!isFullscreen) {
+      if (visualizerContainerRef.current?.requestFullscreen) {
+        visualizerContainerRef.current.requestFullscreen().catch(() => {});
+      }
+      setIsFullscreen(true);
+    } else {
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+      setIsFullscreen(false);
+    }
+    setTimeout(() => {
+      if (reactFlowInstanceRef.current) {
+        reactFlowInstanceRef.current.fitView({ padding: 0.12, duration: 400 });
+      }
+    }, 180);
+  }, [isFullscreen]);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const isNowFullscreen = !!document.fullscreenElement;
+      setIsFullscreen(isNowFullscreen);
+      setTimeout(() => {
+        if (reactFlowInstanceRef.current) {
+          reactFlowInstanceRef.current.fitView({ padding: 0.12, duration: 400 });
+        }
+      }, 180);
+    };
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isFullscreen]);
+
+  // ==========================================================================
   // 1. DATA FETCHING & WEBSOCKET ENGINE
   // ==========================================================================
-
   const fetchLiveSnapshot = useCallback(async () => {
     try {
       const data = await fetchRealtimeAgentMonitoring();
@@ -206,7 +279,6 @@ export const WorkflowVisualizerTab = () => {
   // ==========================================================================
   // 2. REPLAY ENGINE (REPLAY MODE)
   // ==========================================================================
-
   const loadReplayData = async () => {
     try {
       const manifest = await fetchVisualizerReplayManifest();
@@ -245,9 +317,58 @@ export const WorkflowVisualizerTab = () => {
   }, [mode, isPlayingReplay, replayManifest, replaySpeed]);
 
   // ==========================================================================
+  // AGENT FOCUS & WORKSTATION INSPECTION
+  // ==========================================================================
+  const handleSelectAndFocusAgent = useCallback((agentData) => {
+    if (!agentData) return;
+    setFocusedAgent(agentData);
+    setIsWorkstationMinimized(false);
+
+    setNodes((prevNodes) => {
+      const foundNode = prevNodes.find(
+        (n) =>
+          n.data?.agent_code === agentData.agent_code ||
+          n.data?.agent_name === agentData.agent_name ||
+          n.id === agentData.agent_code
+      );
+      if (foundNode && reactFlowInstanceRef.current) {
+        reactFlowInstanceRef.current.setCenter(
+          foundNode.position.x + 130,
+          foundNode.position.y + 70,
+          { zoom: 1.45, duration: 600 }
+        );
+      }
+      return prevNodes.map((n) => ({
+        ...n,
+        selected: foundNode ? n.id === foundNode.id : false,
+      }));
+    });
+  }, [setNodes]);
+
+  const handleFocusByNodeId = useCallback((nodeId) => {
+    setNodes((prevNodes) => {
+      const foundNode = prevNodes.find((n) => n.id === nodeId);
+      if (foundNode) {
+        setFocusedAgent(foundNode.data);
+        setIsWorkstationMinimized(false);
+        if (reactFlowInstanceRef.current) {
+          reactFlowInstanceRef.current.setCenter(
+            foundNode.position.x + 130,
+            foundNode.position.y + 70,
+            { zoom: 1.45, duration: 600 }
+          );
+        }
+      }
+      return prevNodes.map((n) => ({
+        ...n,
+        selected: n.id === nodeId,
+      }));
+    });
+  }, [setNodes]);
+
+  // ==========================================================================
   // 3. TOPOLOGY & DYNAMIC AGENT GRAPH BUILDER
   // ==========================================================================
-
   useEffect(() => {
     let sourceAgents = [];
     let activeEvent = lastEvent;
@@ -377,18 +498,19 @@ export const WorkflowVisualizerTab = () => {
       completed_tasks: 0,
     };
 
-    // Calculate layout coordinates
+    // Calculate layout coordinates with generous vertical & horizontal spacing
     const calculatedNodes = [
       // 1. Supervisor Agent (Top Anchor overseeing the fleet)
       {
         id: 'supervisor-node',
         type: 'supervisorNode',
-        position: { x: 740, y: 30 },
+        position: { x: 860, y: 25 },
         data: {
           ...supervisorAgent,
           monitored_count: sourceAgents.length,
           unresponsive_count: sourceAgents.filter((a) => a.status === 'FAILED' || a.status === 'UNRESPONSIVE').length,
           recovery_count: monitoringData?.metrics?.failed_requests || 0,
+          onFocusAgent: handleSelectAndFocusAgent,
         },
       },
 
@@ -396,23 +518,29 @@ export const WorkflowVisualizerTab = () => {
       {
         id: 'customer-node',
         type: 'agentNode',
-        position: { x: 40, y: 300 },
-        data: customerAgent,
+        position: { x: 50, y: 300 },
+        data: {
+          ...customerAgent,
+          onFocusAgent: handleSelectAndFocusAgent,
+        },
       },
 
       // 3. Intake Agent (Classification & validation)
       {
         id: 'intake-node',
         type: 'agentNode',
-        position: { x: 340, y: 300 },
-        data: intakeAgent,
+        position: { x: 370, y: 300 },
+        data: {
+          ...intakeAgent,
+          onFocusAgent: handleSelectAndFocusAgent,
+        },
       },
 
       // 4. RabbitMQ Message Broker
       {
         id: 'rabbitmq-node',
         type: 'infrastructureNode',
-        position: { x: 640, y: 300 },
+        position: { x: 690, y: 300 },
         data: {
           type: 'RABBITMQ',
           title: 'RabbitMQ Message Broker',
@@ -423,16 +551,18 @@ export const WorkflowVisualizerTab = () => {
         },
       },
 
-      // 5. Dynamic Request Agents Pool (Laid out in neat vertical column)
+      // 5. Dynamic Request Agents Pool (Laid out in vertical column with 160px spacing)
       ...displayRequestAgents.map((rag, idx) => {
-        // Vertical spacing offset based on count
-        const startY = 160;
-        const spacingY = 130;
+        const startY = 120;
+        const spacingY = 160;
         return {
           id: `req-agent-node-${idx}`,
           type: 'agentNode',
-          position: { x: 940, y: startY + idx * spacingY },
-          data: rag,
+          position: { x: 1010, y: startY + idx * spacingY },
+          data: {
+            ...rag,
+            onFocusAgent: handleSelectAndFocusAgent,
+          },
         };
       }),
 
@@ -440,23 +570,29 @@ export const WorkflowVisualizerTab = () => {
       {
         id: 'verif-node',
         type: 'agentNode',
-        position: { x: 1250, y: 300 },
-        data: verificationAgent,
+        position: { x: 1330, y: 300 },
+        data: {
+          ...verificationAgent,
+          onFocusAgent: handleSelectAndFocusAgent,
+        },
       },
 
       // 7. Service Agent Pool
       {
         id: 'service-node',
         type: 'agentNode',
-        position: { x: 1550, y: 300 },
-        data: serviceLead,
+        position: { x: 1650, y: 300 },
+        data: {
+          ...serviceLead,
+          onFocusAgent: handleSelectAndFocusAgent,
+        },
       },
 
       // 8. PostgreSQL Primary Database
       {
         id: 'postgres-node',
         type: 'infrastructureNode',
-        position: { x: 1850, y: 300 },
+        position: { x: 1970, y: 300 },
         data: {
           type: 'POSTGRESQL',
           title: 'PostgreSQL Registry',
@@ -478,21 +614,20 @@ export const WorkflowVisualizerTab = () => {
     const isIntakeToRabbit =
       evType === 'REQUEST_CLASSIFIED' || evType === 'INTAKE_ACCEPTED';
     const isRabbitToReq =
-      evType === 'REQUEST_ASSIGNED' || evType === 'REQUEST_ACCEPTED' || evType === 'REQUEST_DISPATCHED';
+      evType === 'REQUEST_ASSIGNED' || evType === 'TASK_DISPATCHED';
     const isReqToVerif =
-      evType === 'VERIFICATION_STARTED' || evType === 'VERIFICATION_COMPLETED';
+      evType === 'VERIFICATION_REQUESTED' || evType === 'FRAUD_CHECK_INITIATED';
     const isVerifToService =
-      evType === 'SERVICE_STARTED' || evType === 'SERVICE_COMPLETED';
+      evType === 'VERIFICATION_PASSED' || evType === 'SERVICE_EXECUTION_REQUESTED';
     const isServiceToDb =
-      evType === 'REQUEST_COMPLETED' || evType === 'RECORD_SAVED';
+      evType === 'SERVICE_COMPLETED' || evType === 'DATABASE_COMMITTED';
     const isSupervisorActive =
-      evType === 'AGENT_FAILED' || evType === 'RECOVERY_COMPLETED' || evType === 'HEARTBEAT_TIMEOUT';
+      evType.includes('SUPERVISOR') || evType.includes('RECOVER') || evType.includes('HEALTH');
 
-    // Build directed edges with animated packet indicators
     const calculatedEdges = [
       // Customer -> Intake
       {
-        id: 'edge-cust-intake',
+        id: 'edge-customer-intake',
         source: 'customer-node',
         target: 'intake-node',
         type: 'animatedPacket',
@@ -631,12 +766,16 @@ export const WorkflowVisualizerTab = () => {
 
     setNodes(calculatedNodes);
     setEdges(calculatedEdges);
-  }, [monitoringData, mode, replayManifest, replayTick, lastEvent, setNodes, setEdges]);
+  }, [monitoringData, mode, replayManifest, replayTick, lastEvent, setNodes, setEdges, handleSelectAndFocusAgent]);
 
   // Node & Edge selection handlers
   const handleNodeClick = useCallback((event, node) => {
     setSelectedEdge(null);
     setSelectedAgent(node.data);
+    if (node.type === 'agentNode' || node.type === 'supervisorNode') {
+      setFocusedAgent(node.data);
+      setIsWorkstationMinimized(false);
+    }
   }, []);
 
   const handleEdgeClick = useCallback((event, edge) => {
@@ -645,7 +784,6 @@ export const WorkflowVisualizerTab = () => {
   }, []);
 
   const handlePaneClick = useCallback(() => {
-    setSelectedAgent(null);
     setSelectedEdge(null);
   }, []);
 
@@ -655,7 +793,7 @@ export const WorkflowVisualizerTab = () => {
     setBenchmarkMsg(null);
     try {
       await runSimulationScenario(1);
-      setBenchmarkMsg('Concurrent benchmark requests injected! Watch agents process simultaneously.');
+      setBenchmarkMsg('Concurrent benchmark requests dispatched! Watch agents process concurrently.');
       await fetchLiveSnapshot();
     } catch (err) {
       setBenchmarkMsg(`Benchmark error: ${err.message}`);
@@ -678,7 +816,7 @@ export const WorkflowVisualizerTab = () => {
   // Fit view helper
   const handleFitView = () => {
     if (reactFlowInstanceRef.current) {
-      reactFlowInstanceRef.current.fitView({ padding: 0.15, duration: 600 });
+      reactFlowInstanceRef.current.fitView({ padding: 0.12, duration: 600 });
     }
   };
 
@@ -690,10 +828,26 @@ export const WorkflowVisualizerTab = () => {
     active_workers: 0,
   };
 
+  // Pipeline agents list for focus bar
+  const activeAgentList = monitoringData?.agents || [];
+  const customerAgent = activeAgentList.find((a) => a.agent_type === 'CUSTOMER');
+  const intakeAgent = activeAgentList.find((a) => a.agent_type === 'INTAKE');
+  const requestWorkers = activeAgentList.filter((a) => a.agent_type === 'REQUEST');
+  const verifAgent = activeAgentList.find((a) => a.agent_type === 'VERIFICATION');
+  const serviceAgent = activeAgentList.find((a) => a.agent_type === 'SERVICE');
+  const supervisorAgent = activeAgentList.find((a) => a.agent_type === 'SUPERVISOR');
+
   return (
-    <div className="space-y-6">
+    <div
+      ref={visualizerContainerRef}
+      className={
+        isFullscreen
+          ? 'fixed inset-0 z-50 w-screen h-screen bg-[#070d1e] flex flex-col p-4 sm:p-6 overflow-hidden'
+          : 'space-y-6'
+      }
+    >
       {/* Top Level Visualizer View Selector */}
-      <div className="bg-[#091124] border border-slate-800 rounded-2xl p-2.5 shadow-xl flex items-center justify-between">
+      <div className="bg-[#091124] border border-slate-800 rounded-2xl p-2.5 shadow-xl flex items-center justify-between gap-3">
         <div className="flex items-center space-x-1.5 overflow-x-auto w-full sm:w-auto">
           <button
             onClick={() => setActiveVisualizerView('agents')}
@@ -743,299 +897,621 @@ export const WorkflowVisualizerTab = () => {
             <span>Failure & Recovery Sequence</span>
           </button>
         </div>
+
+        {/* Global Fullscreen Toggle */}
+        <div className="flex items-center space-x-2 flex-shrink-0">
+          <button
+            onClick={toggleFullscreen}
+            className={`inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm border ${
+              isFullscreen
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 hover:bg-amber-500/30'
+                : 'bg-slate-900 text-slate-200 border-slate-700 hover:text-white hover:bg-slate-800'
+            }`}
+            title={isFullscreen ? 'Exit Full Screen (Esc)' : 'Expand to Full Screen'}
+          >
+            {isFullscreen ? (
+              <>
+                <Minimize2 className="w-4 h-4 text-amber-400" />
+                <span>Exit Full Screen (Esc)</span>
+              </>
+            ) : (
+              <>
+                <Maximize2 className="w-4 h-4 text-cyan-400" />
+                <span>Full Screen</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
-      {activeVisualizerView === 'federation' && <FederationNetworkView />}
-      {activeVisualizerView === 'security' && <SecurityOperationsView />}
-      {activeVisualizerView === 'recovery' && <FailureRecoveryView />}
+      {/* Subview Container (scrollable when not in agent canvas fullscreen) */}
+      <div className={isFullscreen && activeVisualizerView === 'agents' && swarmSubView === 'graph' ? 'flex-1 flex flex-col min-h-0' : 'space-y-6 overflow-y-auto'}>
+        {activeVisualizerView === 'federation' && <FederationNetworkView />}
+        {activeVisualizerView === 'security' && <SecurityOperationsView />}
+        {activeVisualizerView === 'recovery' && <FailureRecoveryView />}
 
-      {activeVisualizerView === 'agents' && (
-        <>
-          {/* Top Action Bar & Mode Switcher */}
-          <div className="bg-[#091124] border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-wrap items-center justify-between gap-4">
-        {/* Title & Live Status */}
-        <div className="flex items-center space-x-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500/20 via-cyan-500/20 to-indigo-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-lg">
-            <Workflow className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="flex items-center space-x-2.5">
-              <h2 className="text-lg font-bold text-white tracking-tight">AI Workflow Visualizer</h2>
-              {mode === 'LIVE' ? (
-                isLiveRunning ? (
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center space-x-1.5 shadow-sm">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span>LIVE STREAM</span>
-                  </span>
-                ) : (
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-500/20 text-red-300 border border-red-500/40 font-mono">
-                    SIMULATION STOPPED
-                  </span>
-                )
-              ) : (
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40 font-mono flex items-center space-x-1">
-                  <span>📼 REPLAY MODE</span>
-                </span>
-              )}
+        {activeVisualizerView === 'agents' && (
+          <>
+            {/* Top Action Bar & Mode Switcher */}
+            <div className="bg-[#091124] border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-wrap items-center justify-between gap-4">
+              {/* Title & Live Status */}
+              <div className="flex items-center space-x-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500/20 via-cyan-500/20 to-indigo-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-lg">
+                  <Workflow className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2.5">
+                    <h2 className="text-lg font-bold text-white tracking-tight">AI Workflow Visualizer</h2>
+                    {mode === 'LIVE' ? (
+                      isLiveRunning ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center space-x-1.5 shadow-sm">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                          <span>LIVE STREAM</span>
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-500/20 text-red-300 border border-red-500/40 font-mono">
+                          SIMULATION STOPPED
+                        </span>
+                      )
+                    ) : (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40 font-mono flex items-center space-x-1">
+                        <span>📼 REPLAY MODE</span>
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-400 font-mono mt-0.5">
+                    Real-time multi-agent communication, autonomous decisions, and operational workload
+                  </p>
+                </div>
+              </div>
+
+              {/* Mode Toggle & Feature Toolbar */}
+              <div className="flex flex-wrap items-center gap-2.5">
+                {/* Mode Switch (LIVE vs REPLAY) */}
+                <div className="flex items-center rounded-xl bg-slate-950 p-1 border border-slate-800">
+                  <button
+                    onClick={() => {
+                      setMode('LIVE');
+                      setIsPlayingReplay(false);
+                    }}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
+                      mode === 'LIVE'
+                        ? 'bg-emerald-500 text-slate-950 shadow-md font-bold'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Live Telemetry
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMode('REPLAY');
+                    }}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
+                      mode === 'REPLAY'
+                        ? 'bg-purple-500 text-white shadow-md font-bold'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Recorded Replay
+                  </button>
+                </div>
+
+                {/* Decision Inspector Trigger */}
+                <button
+                  onClick={() => setDecisionModalOpen(true)}
+                  className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 transition shadow-sm"
+                >
+                  <Terminal className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Decisions</span>
+                </button>
+
+                {/* Request Journey Trigger */}
+                <button
+                  onClick={() => setJourneyDrawerOpen(true)}
+                  className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition shadow-sm"
+                >
+                  <Workflow className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Journey Inspector</span>
+                </button>
+
+                {/* Fleet Analytics Trigger */}
+                <button
+                  onClick={() => setAnalyticsDrawerOpen(true)}
+                  className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 transition shadow-sm"
+                >
+                  <BarChart2 className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Analytics</span>
+                </button>
+
+                {/* Concurrent Benchmark Runner */}
+                <button
+                  onClick={handleRunBenchmark}
+                  disabled={benchmarkLoading}
+                  className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-950 bg-gradient-to-r from-emerald-400 to-cyan-400 hover:from-emerald-300 hover:to-cyan-300 transition shadow-lg shadow-emerald-500/10 disabled:opacity-50"
+                >
+                  <Flame className="w-3.5 h-3.5" />
+                  <span>{benchmarkLoading ? 'Dispatching...' : 'Test Swarm'}</span>
+                </button>
+              </div>
             </div>
-            <p className="text-xs text-slate-400 font-mono mt-0.5">
-              Interactive node graph displaying real-time agent message routing, decisions, and telemetry
-            </p>
-          </div>
-        </div>
 
-        {/* Mode Toggle & Feature Toolbar */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          {/* Mode Switch (LIVE vs REPLAY) */}
-          <div className="flex items-center rounded-xl bg-slate-950 p-1 border border-slate-800">
-            <button
-              onClick={() => {
-                setMode('LIVE');
-                setIsPlayingReplay(false);
-              }}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                mode === 'LIVE'
-                  ? 'bg-emerald-500 text-slate-950 shadow-md font-bold'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Live Telemetry
-            </button>
-            <button
-              onClick={() => {
-                setMode('REPLAY');
-              }}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                mode === 'REPLAY'
-                  ? 'bg-purple-500 text-white shadow-md font-bold'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Recorded Replay
-            </button>
-          </div>
+            {benchmarkMsg && (
+              <div className="p-3 rounded-xl bg-cyan-950/60 border border-cyan-800 text-xs text-cyan-200 flex items-center justify-between">
+                <span>{benchmarkMsg}</span>
+                <button onClick={() => setBenchmarkMsg(null)} className="text-cyan-400 font-bold hover:text-white">
+                  Dismiss
+                </button>
+              </div>
+            )}
 
-          {/* Decision Inspector Trigger */}
-          <button
-            onClick={() => setDecisionModalOpen(true)}
-            className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 transition shadow-sm"
-          >
-            <Terminal className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Decisions</span>
-          </button>
+            {/* Replay Controller Bar (Visible only in REPLAY mode) */}
+            {mode === 'REPLAY' && (
+              <div className="bg-[#0b1429] border border-purple-500/30 rounded-2xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-4 animate-fadeIn">
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={() => setIsPlayingReplay((prev) => !prev)}
+                    className="w-9 h-9 rounded-xl bg-purple-500 hover:bg-purple-400 text-white flex items-center justify-center shadow-lg transition"
+                  >
+                    {isPlayingReplay ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current ml-0.5" />}
+                  </button>
 
-          {/* Request Journey Trigger */}
-          <button
-            onClick={() => setJourneyDrawerOpen(true)}
-            className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition shadow-sm"
-          >
-            <Workflow className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Journey Inspector</span>
-          </button>
+                  <button
+                    onClick={() => {
+                      const total = (replayManifest?.snapshots || []).length;
+                      setReplayTick((prev) => Math.min(total - 1, prev + 1));
+                    }}
+                    className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+                  >
+                    Step +1
+                  </button>
 
-          {/* Fleet Analytics Trigger */}
-          <button
-            onClick={() => setAnalyticsDrawerOpen(true)}
-            className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 transition shadow-sm"
-          >
-            <BarChart2 className="w-3.5 h-3.5 text-purple-400" />
-            <span>Analytics</span>
-          </button>
+                  <button
+                    onClick={() => {
+                      setReplayTick(0);
+                      setIsPlayingReplay(false);
+                    }}
+                    className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+                  >
+                    Reset
+                  </button>
+                </div>
 
-          {/* Concurrent Benchmark Runner */}
-          <button
-            onClick={handleRunBenchmark}
-            disabled={benchmarkLoading}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-950 bg-gradient-to-r from-emerald-400 to-cyan-400 hover:from-emerald-300 hover:to-cyan-300 transition shadow-lg shadow-emerald-500/10 disabled:opacity-50"
-          >
-            <Flame className="w-3.5 h-3.5" />
-            <span>{benchmarkLoading ? 'Dispatching...' : 'Test Swarm'}</span>
-          </button>
-        </div>
-      </div>
+                {/* Timeline Scrubber */}
+                <div className="flex-1 min-w-[200px] max-w-md flex items-center space-x-3">
+                  <span className="text-xs font-mono text-slate-400">Tick:</span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={Math.max(0, (replayManifest?.snapshots || []).length - 1)}
+                    value={replayTick}
+                    onChange={(e) => {
+                      setReplayTick(Number(e.target.value));
+                      setIsPlayingReplay(false);
+                    }}
+                    className="flex-1 accent-purple-500 cursor-pointer"
+                  />
+                  <span className="font-mono text-xs font-bold text-purple-300">
+                    {replayTick} / {Math.max(0, (replayManifest?.snapshots || []).length - 1)}
+                  </span>
+                </div>
 
-      {benchmarkMsg && (
-        <div className="p-3 rounded-xl bg-cyan-950/60 border border-cyan-800 text-xs text-cyan-200 flex items-center justify-between">
-          <span>{benchmarkMsg}</span>
-          <button onClick={() => setBenchmarkMsg(null)} className="text-cyan-400 font-bold hover:text-white">
-            Dismiss
-          </button>
-        </div>
-      )}
+                {/* Speed Multipliers */}
+                <div className="flex items-center space-x-1.5 text-xs">
+                  <span className="text-slate-400 font-mono mr-1">Speed:</span>
+                  {[0.5, 1, 2, 5].map((spd) => (
+                    <button
+                      key={spd}
+                      onClick={() => setReplaySpeed(spd)}
+                      className={`px-2 py-0.5 rounded text-[11px] font-mono font-bold transition ${
+                        replaySpeed === spd
+                          ? 'bg-purple-500 text-white'
+                          : 'bg-slate-800 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {spd}x
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
-      {/* Replay Controller Bar (Visible only in REPLAY mode) */}
-      {mode === 'REPLAY' && (
-        <div className="bg-[#0b1429] border border-purple-500/30 rounded-2xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-4 animate-fadeIn">
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setIsPlayingReplay((prev) => !prev)}
-              className="w-9 h-9 rounded-xl bg-purple-500 hover:bg-purple-400 text-white flex items-center justify-center shadow-lg transition"
-            >
-              {isPlayingReplay ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current ml-0.5" />}
-            </button>
+            {/* Sub-View Switcher: Topology Graph vs Neat Agent Work Deck */}
+            <div className="flex items-center justify-between bg-[#091124] border border-slate-800 rounded-2xl p-2.5 shadow-lg">
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setSwarmSubView('graph')}
+                  className={`inline-flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+                    swarmSubView === 'graph'
+                      ? 'bg-cyan-500 text-slate-950 shadow-md font-extrabold'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-900/60'
+                  }`}
+                >
+                  <Workflow className="w-4 h-4" />
+                  <span>Interactive Swarm Topology Canvas</span>
+                </button>
 
-            <button
-              onClick={() => {
-                const total = (replayManifest?.snapshots || []).length;
-                setReplayTick((prev) => Math.min(total - 1, prev + 1));
-              }}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
-            >
-              Step +1
-            </button>
+                <button
+                  onClick={() => setSwarmSubView('deck')}
+                  className={`inline-flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+                    swarmSubView === 'deck'
+                      ? 'bg-emerald-500 text-slate-950 shadow-md font-extrabold'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-900/60'
+                  }`}
+                >
+                  <Cpu className="w-4 h-4" />
+                  <span>Neat Agent Work Deck (All Agents Grid)</span>
+                </button>
+              </div>
 
-            <button
-              onClick={() => {
-                setReplayTick(0);
-                setIsPlayingReplay(false);
-              }}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
-            >
-              Reset
-            </button>
-          </div>
+              <div className="hidden sm:flex items-center space-x-2 text-xs font-mono text-slate-400">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                <span>
+                  {swarmSubView === 'graph' ? 'Visual Canvas Mode' : 'Structured Workstation Cards'}
+                </span>
+              </div>
+            </div>
 
-          {/* Timeline Scrubber */}
-          <div className="flex-1 min-w-[200px] max-w-md flex items-center space-x-3">
-            <span className="text-xs font-mono text-slate-400">Tick:</span>
-            <input
-              type="range"
-              min={0}
-              max={Math.max(0, (replayManifest?.snapshots || []).length - 1)}
-              value={replayTick}
-              onChange={(e) => {
-                setReplayTick(Number(e.target.value));
-                setIsPlayingReplay(false);
-              }}
-              className="flex-1 accent-purple-500 cursor-pointer"
+            {/* VIEW 1: NEAT AGENT WORK DECK */}
+            {swarmSubView === 'deck' && (
+              <AgentWorkDeck
+                agents={monitoringData?.agents || []}
+                metrics={metrics}
+                onFocusAgentOnGraph={(agent) => {
+                  setSwarmSubView('graph');
+                  setTimeout(() => {
+                    handleSelectAndFocusAgent(agent);
+                  }, 120);
+                }}
+                onSelectRequest={handleOpenJourney}
+              />
+            )}
+
+            {/* VIEW 2: INTERACTIVE REACT FLOW CANVAS */}
+            {swarmSubView === 'graph' && (
+              <div className="space-y-3 flex-1 flex flex-col min-h-0">
+                {/* Agent Focus Quick Dock */}
+                <div className="flex items-center space-x-1.5 overflow-x-auto py-1 px-1 bg-[#091124] rounded-2xl border border-slate-800 text-xs shadow-md">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 px-3 font-mono flex items-center space-x-1.5 flex-shrink-0">
+                    <Eye className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Focus Agent:</span>
+                  </span>
+
+                  <button
+                    onClick={handleFitView}
+                    className="px-3 py-1.5 rounded-xl text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 transition whitespace-nowrap text-xs font-semibold flex items-center space-x-1 flex-shrink-0"
+                  >
+                    <span>🌐 Fleet Overview</span>
+                  </button>
+
+                  {/* Customer */}
+                  <button
+                    onClick={() => handleFocusByNodeId('customer-node')}
+                    className={`px-3 py-1.5 rounded-xl transition whitespace-nowrap text-xs font-semibold flex items-center space-x-1.5 border flex-shrink-0 ${
+                      focusedAgent?.agent_type === 'CUSTOMER'
+                        ? 'bg-cyan-500/20 text-cyan-200 border-cyan-500/50'
+                        : 'bg-slate-900 text-slate-300 hover:text-white border-slate-800'
+                    }`}
+                  >
+                    <User className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Customer</span>
+                    {customerAgent?.status === 'PROCESSING' && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                    )}
+                  </button>
+
+                  {/* Intake */}
+                  <button
+                    onClick={() => handleFocusByNodeId('intake-node')}
+                    className={`px-3 py-1.5 rounded-xl transition whitespace-nowrap text-xs font-semibold flex items-center space-x-1.5 border flex-shrink-0 ${
+                      focusedAgent?.agent_type === 'INTAKE'
+                        ? 'bg-cyan-500/20 text-cyan-200 border-cyan-500/50'
+                        : 'bg-slate-900 text-slate-300 hover:text-white border-slate-800'
+                    }`}
+                  >
+                    <Inbox className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Intake</span>
+                    {intakeAgent?.status === 'PROCESSING' && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                    )}
+                  </button>
+
+                  {/* Dynamic Request Agents */}
+                  {requestWorkers.map((rag, idx) => {
+                    const isThisFocused = focusedAgent?.agent_code === rag.agent_code;
+                    return (
+                      <button
+                        key={rag.agent_code || idx}
+                        onClick={() => handleFocusByNodeId(`req-agent-node-${idx}`)}
+                        className={`px-3 py-1.5 rounded-xl transition whitespace-nowrap text-xs font-semibold flex items-center space-x-1.5 border flex-shrink-0 ${
+                          isThisFocused
+                            ? 'bg-cyan-500/20 text-cyan-200 border-cyan-500/50'
+                            : 'bg-slate-900 text-slate-300 hover:text-white border-slate-800'
+                        }`}
+                      >
+                        <Cpu className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>Worker {idx}</span>
+                        {rag.status === 'PROCESSING' && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                        )}
+                      </button>
+                    );
+                  })}
+
+                  {/* Verification */}
+                  <button
+                    onClick={() => handleFocusByNodeId('verif-node')}
+                    className={`px-3 py-1.5 rounded-xl transition whitespace-nowrap text-xs font-semibold flex items-center space-x-1.5 border flex-shrink-0 ${
+                      focusedAgent?.agent_type === 'VERIFICATION'
+                        ? 'bg-indigo-500/20 text-indigo-200 border-indigo-500/50'
+                        : 'bg-slate-900 text-slate-300 hover:text-white border-slate-800'
+                    }`}
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Verification</span>
+                    {verifAgent?.status === 'PROCESSING' && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                    )}
+                  </button>
+
+                  {/* Service */}
+                  <button
+                    onClick={() => handleFocusByNodeId('service-node')}
+                    className={`px-3 py-1.5 rounded-xl transition whitespace-nowrap text-xs font-semibold flex items-center space-x-1.5 border flex-shrink-0 ${
+                      focusedAgent?.agent_type === 'SERVICE'
+                        ? 'bg-emerald-500/20 text-emerald-200 border-emerald-500/50'
+                        : 'bg-slate-900 text-slate-300 hover:text-white border-slate-800'
+                    }`}
+                  >
+                    <Briefcase className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Service</span>
+                    {serviceAgent?.status === 'PROCESSING' && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                    )}
+                  </button>
+
+                  {/* Supervisor */}
+                  <button
+                    onClick={() => handleFocusByNodeId('supervisor-node')}
+                    className={`px-3 py-1.5 rounded-xl transition whitespace-nowrap text-xs font-semibold flex items-center space-x-1.5 border flex-shrink-0 ${
+                      focusedAgent?.agent_type === 'SUPERVISOR'
+                        ? 'bg-emerald-500/20 text-emerald-200 border-emerald-500/50'
+                        : 'bg-slate-900 text-slate-300 hover:text-white border-slate-800'
+                    }`}
+                  >
+                    <Eye className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Supervisor</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                  </button>
+                </div>
+
+                {/* React Flow Graph Canvas */}
+                <div
+                  className={`relative w-full bg-[#070d1e] border border-slate-800 rounded-3xl overflow-hidden shadow-2xl transition-all ${
+                    isFullscreen ? 'flex-1 h-full min-h-[500px]' : 'h-[680px]'
+                  }`}
+                >
+                  <ReactFlow
+                    nodes={nodes}
+                    edges={edges}
+                    onNodesChange={onNodesChange}
+                    onEdgesChange={onEdgesChange}
+                    onNodeClick={handleNodeClick}
+                    onEdgeClick={handleEdgeClick}
+                    onPaneClick={handlePaneClick}
+                    nodeTypes={nodeTypes}
+                    edgeTypes={edgeTypes}
+                    fitView
+                    fitViewOptions={{ padding: 0.12 }}
+                    minZoom={0.2}
+                    maxZoom={2.0}
+                    onInit={(instance) => {
+                      reactFlowInstanceRef.current = instance;
+                    }}
+                    className="bg-[#070d1e]"
+                  >
+                    <Background color="#1e293b" gap={24} size={1.2} />
+                    <Controls className="!bg-[#091124] !border-slate-800 !rounded-xl overflow-hidden shadow-xl fill-slate-300" />
+                    <MiniMap
+                      nodeStrokeColor="#10b981"
+                      nodeColor="#091124"
+                      maskColor="rgba(7, 13, 30, 0.75)"
+                      className="!bg-[#091124] !border-slate-800 !rounded-xl overflow-hidden shadow-xl"
+                    />
+                  </ReactFlow>
+
+                  {/* Floating Canvas Quick Controls (Top-Right) */}
+                  <div className="absolute top-4 right-4 z-10 flex items-center space-x-2">
+                    <button
+                      onClick={handleFitView}
+                      className="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700 shadow-lg backdrop-blur-md transition"
+                      title="Fit to Screen"
+                    >
+                      <Workflow className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={toggleFullscreen}
+                      className="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700 shadow-lg backdrop-blur-md transition"
+                      title={isFullscreen ? 'Exit Full Screen' : 'Full Screen'}
+                    >
+                      {isFullscreen ? <Minimize2 className="w-4 h-4 text-amber-400" /> : <Maximize2 className="w-4 h-4 text-cyan-400" />}
+                    </button>
+                  </div>
+
+                  {/* Floating Metrics Pill (Bottom-Left) */}
+                  <div className="absolute bottom-4 left-4 z-10 hidden sm:flex items-center space-x-3 px-4 py-2 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl backdrop-blur-md text-xs font-mono">
+                    <div className="flex items-center space-x-1.5 text-slate-400">
+                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                      <span>Active Workers:</span>
+                      <span className="text-white font-bold">{metrics.active_workers}</span>
+                    </div>
+                    <span className="text-slate-700">•</span>
+                    <div className="flex items-center space-x-1 text-slate-400">
+                      <span>Processed:</span>
+                      <span className="text-emerald-400 font-bold">{metrics.processed_requests}</span>
+                    </div>
+                    <span className="text-slate-700">•</span>
+                    <div className="flex items-center space-x-1 text-slate-400">
+                      <span>In-Flight:</span>
+                      <span className="text-indigo-400 font-bold">{metrics.pending_requests}</span>
+                    </div>
+                  </div>
+
+                  {/* Docked Collapsible Agent Workstation HUD (Bottom-Right) */}
+                  {focusedAgent && (
+                    <div className="absolute bottom-4 right-4 z-20 max-w-sm w-full bg-[#091124]/95 backdrop-blur-xl border border-cyan-500/40 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300">
+                      {/* Workstation Header */}
+                      <div className="p-3 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between">
+                        <div className="flex items-center space-x-2.5 min-w-0">
+                          <div className="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center justify-center">
+                            <Cpu className="w-4 h-4" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="text-xs font-bold text-white truncate">
+                              {focusedAgent.agent_name || focusedAgent.agent_code}
+                            </div>
+                            <div className="text-[10px] text-slate-400 font-mono">
+                              {focusedAgent.agent_code} •{' '}
+                              <span
+                                className={`font-bold ${
+                                  focusedAgent.status === 'PROCESSING'
+                                    ? 'text-cyan-400'
+                                    : focusedAgent.status === 'FAILED'
+                                    ? 'text-red-400'
+                                    : 'text-emerald-400'
+                                }`}
+                              >
+                                {focusedAgent.status}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-1">
+                          <button
+                            onClick={() => setIsWorkstationMinimized((prev) => !prev)}
+                            className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                            title={isWorkstationMinimized ? 'Expand Work Details' : 'Minimize HUD'}
+                          >
+                            {isWorkstationMinimized ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          </button>
+                          <button
+                            onClick={() => setFocusedAgent(null)}
+                            className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                            title="Close HUD"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Workstation Body */}
+                      {!isWorkstationMinimized && (
+                        <div className="p-3.5 space-y-3 text-xs">
+                          {/* Active Task Banner */}
+                          {focusedAgent.current_request_id ? (
+                            <div className="p-2.5 rounded-xl bg-cyan-950/70 border border-cyan-500/40 space-y-2 shadow-inner">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[10px] uppercase font-bold text-cyan-300 flex items-center space-x-1">
+                                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                                  <span>ACTIVE TASK:</span>
+                                </span>
+                                <span className="font-mono text-xs font-bold text-white px-2 py-0.5 rounded bg-cyan-900/80 border border-cyan-400/40">
+                                  {focusedAgent.current_request_id}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between text-[11px] text-slate-300">
+                                <span className="text-slate-400">Current Stage:</span>
+                                <span className="font-mono font-semibold text-cyan-200">
+                                  {focusedAgent.current_stage || 'IN_PROGRESS'}
+                                </span>
+                              </div>
+                              <button
+                                onClick={() => handleOpenJourney(focusedAgent.current_request_id)}
+                                className="w-full mt-1 py-1 rounded bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-[11px] font-semibold flex items-center justify-center space-x-1 transition"
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                                <span>Inspect Request Journey</span>
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-center text-slate-400 text-[11px] italic">
+                              Standby • Listening on{' '}
+                              <span className="font-mono text-slate-300 font-semibold">
+                                bankflow.queue.{focusedAgent.agent_code}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Throughput Counters */}
+                          <div className="grid grid-cols-3 gap-1.5 text-center text-[11px]">
+                            <div className="p-2 rounded-lg bg-slate-900/80 border border-slate-800">
+                              <span className="text-[9px] uppercase text-slate-400 block font-semibold">Done</span>
+                              <span className="font-mono font-bold text-emerald-400 text-xs mt-0.5 block">
+                                {focusedAgent.completed_tasks || 0}
+                              </span>
+                            </div>
+                            <div className="p-2 rounded-lg bg-slate-900/80 border border-slate-800">
+                              <span className="text-[9px] uppercase text-slate-400 block font-semibold">Failed</span>
+                              <span className="font-mono font-bold text-red-400 text-xs mt-0.5 block">
+                                {focusedAgent.failed_tasks || 0}
+                              </span>
+                            </div>
+                            <div className="p-2 rounded-lg bg-slate-900/80 border border-slate-800">
+                              <span className="text-[9px] uppercase text-slate-400 block font-semibold">Health</span>
+                              <span className="font-mono font-bold text-emerald-400 text-xs mt-0.5 block">
+                                {focusedAgent.health_status || 'HEALTHY'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Live Event Timeline Stream */}
+            <LiveEventTimeline
+              events={monitoringData?.events || []}
+              isStreamPaused={isStreamPaused}
+              onTogglePause={handleToggleStreamPause}
+              onSelectRequest={handleOpenJourney}
             />
-            <span className="font-mono text-xs font-bold text-purple-300">
-              {replayTick} / {Math.max(0, (replayManifest?.snapshots || []).length - 1)}
-            </span>
-          </div>
 
-          {/* Speed Multipliers */}
-          <div className="flex items-center space-x-1.5 text-xs">
-            <span className="text-slate-400 font-mono mr-1">Speed:</span>
-            {[0.5, 1, 2, 5].map((spd) => (
-              <button
-                key={spd}
-                onClick={() => setReplaySpeed(spd)}
-                className={`px-2 py-0.5 rounded text-[11px] font-mono font-bold transition ${
-                  replaySpeed === spd
-                    ? 'bg-purple-500 text-white'
-                    : 'bg-slate-800 text-slate-400 hover:text-white'
-                }`}
-              >
-                {spd}x
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+            {/* Modals & Slide-out Drawers */}
+            <AgentInspectorDrawer
+              agent={selectedAgent}
+              onClose={() => setSelectedAgent(null)}
+              onSelectRequest={handleOpenJourney}
+            />
 
-      {/* Interactive React Flow Canvas */}
-      <div className="relative w-full h-[650px] bg-[#070d1e] border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onNodeClick={handleNodeClick}
-          onEdgeClick={handleEdgeClick}
-          onPaneClick={handlePaneClick}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          fitView
-          fitViewOptions={{ padding: 0.12 }}
-          minZoom={0.2}
-          maxZoom={2.0}
-          onInit={(instance) => {
-            reactFlowInstanceRef.current = instance;
-          }}
-          className="bg-[#070d1e]"
-        >
-          <Background color="#1e293b" gap={24} size={1.2} />
-          <Controls className="!bg-[#091124] !border-slate-800 !rounded-xl overflow-hidden shadow-xl fill-slate-300" />
-          <MiniMap
-            nodeStrokeColor="#10b981"
-            nodeColor="#091124"
-            maskColor="rgba(7, 13, 30, 0.75)"
-            className="!bg-[#091124] !border-slate-800 !rounded-xl overflow-hidden shadow-xl"
-          />
-        </ReactFlow>
+            <EdgeInspectorDrawer
+              edge={selectedEdge}
+              onClose={() => setSelectedEdge(null)}
+              onSelectRequest={handleOpenJourney}
+            />
 
-        {/* Floating Canvas Quick Controls (Top-Right) */}
-        <div className="absolute top-4 right-4 z-10 flex items-center space-x-2">
-          <button
-            onClick={handleFitView}
-            className="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700 shadow-lg backdrop-blur-md transition"
-            title="Fit to Screen"
-          >
-            <Maximize2 className="w-4 h-4" />
-          </button>
-        </div>
+            <DecisionInspectorModal
+              isOpen={decisionModalOpen}
+              onClose={() => setDecisionModalOpen(false)}
+              onSelectRequest={handleOpenJourney}
+            />
 
-        {/* Floating Metrics Pill (Bottom-Left) */}
-        <div className="absolute bottom-4 left-4 z-10 hidden sm:flex items-center space-x-3 px-4 py-2 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl backdrop-blur-md text-xs font-mono">
-          <div className="flex items-center space-x-1.5 text-slate-400">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-            <span>Active Workers:</span>
-            <span className="text-white font-bold">{metrics.active_workers}</span>
-          </div>
-          <span className="text-slate-700">•</span>
-          <div className="flex items-center space-x-1 text-slate-400">
-            <span>Processed:</span>
-            <span className="text-emerald-400 font-bold">{metrics.processed_requests}</span>
-          </div>
-          <span className="text-slate-700">•</span>
-          <div className="flex items-center space-x-1 text-slate-400">
-            <span>In-Flight:</span>
-            <span className="text-indigo-400 font-bold">{metrics.pending_requests}</span>
-          </div>
-        </div>
+            <RequestJourneyDrawer
+              isOpen={journeyDrawerOpen}
+              initialRequestId={journeyRequestId}
+              onClose={() => setJourneyDrawerOpen(false)}
+              onSelectRequest={handleOpenJourney}
+            />
+
+            <PerformanceAnalyticsDrawer
+              isOpen={analyticsDrawerOpen}
+              onClose={() => setAnalyticsDrawerOpen(false)}
+            />
+          </>
+        )}
       </div>
-
-      {/* Live Event Timeline Stream */}
-      <LiveEventTimeline
-        events={monitoringData?.events || []}
-        isStreamPaused={isStreamPaused}
-        onTogglePause={handleToggleStreamPause}
-        onSelectRequest={handleOpenJourney}
-      />
-
-      {/* Modals & Slide-out Drawers */}
-      <AgentInspectorDrawer
-        agent={selectedAgent}
-        onClose={() => setSelectedAgent(null)}
-        onSelectRequest={handleOpenJourney}
-      />
-
-      <EdgeInspectorDrawer
-        edge={selectedEdge}
-        onClose={() => setSelectedEdge(null)}
-        onSelectRequest={handleOpenJourney}
-      />
-
-      <DecisionInspectorModal
-        isOpen={decisionModalOpen}
-        onClose={() => setDecisionModalOpen(false)}
-        onSelectRequest={handleOpenJourney}
-      />
-
-      <RequestJourneyDrawer
-        isOpen={journeyDrawerOpen}
-        initialRequestId={journeyRequestId}
-        onClose={() => setJourneyDrawerOpen(false)}
-        onSelectRequest={handleOpenJourney}
-      />
-
-      <PerformanceAnalyticsDrawer
-        isOpen={analyticsDrawerOpen}
-        onClose={() => setAnalyticsDrawerOpen(false)}
-      />
-    </>
-  )}
-</div>
+    </div>
   );
 };

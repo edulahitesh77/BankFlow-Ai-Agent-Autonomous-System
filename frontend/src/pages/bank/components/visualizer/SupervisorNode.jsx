@@ -13,6 +13,7 @@ export const SupervisorNode = memo(({ data, selected }) => {
     recovery_count = 0,
     health_status = 'HEALTHY',
     last_heartbeat,
+    onFocusAgent,
   } = data;
 
   const isFailed = status === 'FAILED' || unresponsive_count > 0;
@@ -20,13 +21,13 @@ export const SupervisorNode = memo(({ data, selected }) => {
 
   return (
     <div
-      className={`relative min-w-[280px] max-w-[320px] rounded-2xl bg-gradient-to-b from-[#111c38]/95 to-[#0b1329]/95 backdrop-blur-md p-4 border transition-all duration-300 cursor-pointer shadow-xl ${
+      className={`relative min-w-[290px] max-w-[330px] rounded-2xl bg-gradient-to-b from-[#111c38]/98 to-[#0b1329]/98 backdrop-blur-md p-4 border transition-all duration-300 cursor-pointer shadow-xl ${
         isFailed
-          ? 'border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.4)]'
+          ? 'border-red-500 shadow-[0_0_28px_rgba(239,68,68,0.5)]'
           : isRecovering
-          ? 'border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.3)]'
-          : 'border-emerald-500/60 hover:border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]'
-      } ${selected ? 'ring-2 ring-emerald-400 scale-[1.02]' : ''}`}
+          ? 'border-purple-400 shadow-[0_0_25px_rgba(168,85,247,0.4)]'
+          : 'border-emerald-500/70 hover:border-emerald-400 shadow-[0_0_22px_rgba(16,185,129,0.25)]'
+      } ${selected ? '!border-emerald-400 ring-2 ring-emerald-400/80 scale-[1.03]' : ''}`}
     >
       {/* Target Handle */}
       <Handle
@@ -38,7 +39,7 @@ export const SupervisorNode = memo(({ data, selected }) => {
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex items-center space-x-2.5">
-          <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-inner">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-inner">
             <Eye className="w-5 h-5" />
           </div>
           <div>
@@ -54,10 +55,24 @@ export const SupervisorNode = memo(({ data, selected }) => {
           </div>
         </div>
 
-        {/* Supervision Live Radar */}
-        <div className="flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-700/60">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-          <span>ACTIVE</span>
+        {/* Supervision Live Radar & Focus */}
+        <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-700/60">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>ACTIVE</span>
+          </div>
+          {onFocusAgent && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onFocusAgent(data);
+              }}
+              title="Focus Supervisor Work"
+              className="p-1 rounded-lg text-slate-400 hover:text-emerald-300 hover:bg-slate-800 transition"
+            >
+              <Eye className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -98,7 +113,7 @@ export const SupervisorNode = memo(({ data, selected }) => {
         type="source"
         position={Position.Bottom}
         id="supervisor-out"
-        className="w-2.5 h-2.5 bg-indigo-400 border-2 border-[#070d1e] !-bottom-1.5"
+        className="w-2.5 h-2.5 bg-emerald-400 border-2 border-[#070d1e] !-bottom-1"
       />
     </div>
   );
