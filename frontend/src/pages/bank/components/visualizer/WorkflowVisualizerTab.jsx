@@ -28,6 +28,9 @@ import {
   Clock,
   CheckCircle2,
   AlertTriangle,
+  Network,
+  Lock,
+  ShieldAlert,
 } from 'lucide-react';
 
 import { AgentNode } from './AgentNode';
@@ -40,6 +43,9 @@ import { DecisionInspectorModal } from './DecisionInspectorModal';
 import { RequestJourneyDrawer } from './RequestJourneyDrawer';
 import { PerformanceAnalyticsDrawer } from './PerformanceAnalyticsDrawer';
 import { LiveEventTimeline } from './LiveEventTimeline';
+import { FederationNetworkView } from './FederationNetworkView';
+import { SecurityOperationsView } from './SecurityOperationsView';
+import { FailureRecoveryView } from './FailureRecoveryView';
 
 import {
   getStoredToken,
@@ -61,6 +67,9 @@ const edgeTypes = {
 };
 
 export const WorkflowVisualizerTab = () => {
+  // Visualizer View Mode: 'agents' | 'federation' | 'security' | 'recovery'
+  const [activeVisualizerView, setActiveVisualizerView] = useState('agents');
+
   // Live Telemetry state
   const [monitoringData, setMonitoringData] = useState(null);
   const [connectionType, setConnectionType] = useState('CONNECTING'); // 'WEBSOCKET' | 'POLLING'
@@ -683,8 +692,67 @@ export const WorkflowVisualizerTab = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Action Bar & Mode Switcher */}
-      <div className="bg-[#091124] border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-wrap items-center justify-between gap-4">
+      {/* Top Level Visualizer View Selector */}
+      <div className="bg-[#091124] border border-slate-800 rounded-2xl p-2.5 shadow-xl flex items-center justify-between">
+        <div className="flex items-center space-x-1.5 overflow-x-auto w-full sm:w-auto">
+          <button
+            onClick={() => setActiveVisualizerView('agents')}
+            className={`inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+              activeVisualizerView === 'agents'
+                ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/30 font-extrabold'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900/60'
+            }`}
+          >
+            <Cpu className="w-4 h-4" />
+            <span>Multi-Agent Swarm</span>
+          </button>
+
+          <button
+            onClick={() => setActiveVisualizerView('federation')}
+            className={`inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+              activeVisualizerView === 'federation'
+                ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30 font-extrabold'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900/60'
+            }`}
+          >
+            <Network className="w-4 h-4" />
+            <span>Federation Network (BLR / CHE / HYD)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveVisualizerView('security')}
+            className={`inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+              activeVisualizerView === 'security'
+                ? 'bg-purple-500 text-slate-950 shadow-md shadow-purple-500/30 font-extrabold'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900/60'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4" />
+            <span>Security Operations & Threat Defense</span>
+          </button>
+
+          <button
+            onClick={() => setActiveVisualizerView('recovery')}
+            className={`inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+              activeVisualizerView === 'recovery'
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30 font-extrabold'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900/60'
+            }`}
+          >
+            <ShieldAlert className="w-4 h-4" />
+            <span>Failure & Recovery Sequence</span>
+          </button>
+        </div>
+      </div>
+
+      {activeVisualizerView === 'federation' && <FederationNetworkView />}
+      {activeVisualizerView === 'security' && <SecurityOperationsView />}
+      {activeVisualizerView === 'recovery' && <FailureRecoveryView />}
+
+      {activeVisualizerView === 'agents' && (
+        <>
+          {/* Top Action Bar & Mode Switcher */}
+          <div className="bg-[#091124] border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-wrap items-center justify-between gap-4">
         {/* Title & Live Status */}
         <div className="flex items-center space-x-3.5">
           <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500/20 via-cyan-500/20 to-indigo-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-lg">
@@ -966,6 +1034,8 @@ export const WorkflowVisualizerTab = () => {
         isOpen={analyticsDrawerOpen}
         onClose={() => setAnalyticsDrawerOpen(false)}
       />
-    </div>
+    </>
+  )}
+</div>
   );
 };

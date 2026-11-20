@@ -1046,6 +1046,89 @@ export const fetchVisualizerReplayManifest = async (scenarioName = 'Default Prod
   return resData;
 };
 
+// ============================================================================
+// FEDERATION, SECURITY, AND RECOVERY VISUALIZATION UPGRADES
+// ============================================================================
+
+export const fetchVisualizerFederationTopology = async () => {
+  const response = await fetch(`${API_BASE}/bank/visualizer/federation/topology`, {
+    headers: getHeaders(true),
+  });
+  handleAuthResponse(response);
+  const resData = await response.json();
+  if (!response.ok) {
+    throw new Error(resData.detail || 'Failed to fetch federation topology.');
+  }
+  return resData;
+};
+
+export const simulateVisualizerFederationExchange = async (payload) => {
+  const response = await fetch(`${API_BASE}/bank/visualizer/federation/simulate-exchange`, {
+    method: 'POST',
+    headers: getHeaders(true),
+    body: JSON.stringify(payload),
+  });
+  handleAuthResponse(response);
+  const resData = await response.json();
+  if (!response.ok) {
+    throw new Error(resData.detail || 'Failed to simulate federation exchange.');
+  }
+  return resData;
+};
+
+export const fetchVisualizerSecurityOverview = async () => {
+  const response = await fetch(`${API_BASE}/bank/visualizer/security/overview`, {
+    headers: getHeaders(true),
+  });
+  handleAuthResponse(response);
+  const resData = await response.json();
+  if (!response.ok) {
+    throw new Error(resData.detail || 'Failed to fetch security architecture overview.');
+  }
+  return resData;
+};
+
+export const executeVisualizerSecurityScenario = async (scenarioId) => {
+  const response = await fetch(`${API_BASE}/bank/visualizer/security/execute-scenario`, {
+    method: 'POST',
+    headers: getHeaders(true),
+    body: JSON.stringify({ scenario_id: scenarioId }),
+  });
+  handleAuthResponse(response);
+  const resData = await response.json();
+  if (!response.ok) {
+    throw new Error(resData.detail || 'Failed to execute security scenario.');
+  }
+  return resData;
+};
+
+export const fetchVisualizerRecoverySequence = async () => {
+  const response = await fetch(`${API_BASE}/bank/visualizer/recovery/sequence`, {
+    headers: getHeaders(true),
+  });
+  handleAuthResponse(response);
+  const resData = await response.json();
+  if (!response.ok) {
+    throw new Error(resData.detail || 'Failed to fetch recovery sequence.');
+  }
+  return resData;
+};
+
+export const simulateVisualizerRecovery = async (failedAgentCode = 'AGT-REQ-01') => {
+  const response = await fetch(`${API_BASE}/bank/visualizer/recovery/simulate-recovery`, {
+    method: 'POST',
+    headers: getHeaders(true),
+    body: JSON.stringify({ failed_agent_code: failedAgentCode }),
+  });
+  handleAuthResponse(response);
+  const resData = await response.json();
+  if (!response.ok) {
+    throw new Error(resData.detail || 'Failed to trigger supervisor recovery simulation.');
+  }
+  return resData;
+};
+
+
 
 
 
